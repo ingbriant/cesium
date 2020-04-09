@@ -33,6 +33,7 @@ var rollup = require('rollup');
 var rollupPluginStripPragma = require('rollup-plugin-strip-pragma');
 var rollupPluginExternalGlobals = require('rollup-plugin-external-globals');
 var rollupPluginUglify = require('rollup-plugin-uglify');
+var rollupTypescript = require('@rollup/plugin-typescript');
 var cleanCSS = require('gulp-clean-css');
 
 var packageJson = require('./package.json');
@@ -985,6 +986,12 @@ gulp.task('convertToModules', function() {
 function combineCesium(debug, optimizer, combineOutput) {
     var plugins = [];
 
+    // node node_modules/.bin/tsc Source/Cesium.js --allowJs --outDir Build/TypeScript --target es6
+    // var plugins = [rollupTypescript({
+    //     tsconfig: './tsconfig.json',
+    //     include: ['Source/**/*.js', 'Source/**/*.ts']
+    // })];
+
     if (!debug) {
         plugins.push(rollupPluginStripPragma({
             pragmas: ['debug']
@@ -995,7 +1002,7 @@ function combineCesium(debug, optimizer, combineOutput) {
     }
 
     return rollup.rollup({
-        input: 'Source/Cesium.js',
+        input: 'Build/TypeScript/Cesium.js',
         plugins: plugins,
         onwarn: rollupWarning
     }).then(function(bundle) {
