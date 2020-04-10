@@ -75,7 +75,7 @@
     "open": "^7.0.0",
     "request": "^2.79.0",
     "rimraf": "^3.0.0",
-    "rollup": "^2.3.4",
+    "rollup": "^1.0.0",
     "rollup-plugin-external-globals": "^0.5.0",
     "rollup-plugin-strip-pragma": "^1.0.0",
     "rollup-plugin-uglify": "^6.0.3",

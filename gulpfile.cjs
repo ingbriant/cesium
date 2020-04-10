@@ -33,7 +33,7 @@ var rollup = require('rollup');
 var rollupPluginStripPragma = require('rollup-plugin-strip-pragma');
 var rollupPluginExternalGlobals = require('rollup-plugin-external-globals');
 var rollupPluginUglify = require('rollup-plugin-uglify');
-var rollupTypescript = require('@rollup/plugin-typescript');
+//var rollupTypescript = require('@rollup/plugin-typescript');
 var cleanCSS = require('gulp-clean-css');
 
 var packageJson = require('./package.json');
@@ -160,7 +160,8 @@ gulp.task('build', function() {
     createCesiumJs();
     createSpecList();
     createJsHintOptions();
-    return Promise.join(createWorkers(), createGalleryList());
+    //return Promise.join(createWorkers(), createGalleryList());
+    return Promise.resolve();
 });
 
 gulp.task('build-watch', function() {
@@ -984,13 +985,10 @@ gulp.task('convertToModules', function() {
 });
 
 function combineCesium(debug, optimizer, combineOutput) {
-    var plugins = [];
+    const result = child_process.execSync('node node_modules/.bin/tsc Source/Cesium.js --allowJs --outDir Build/TypeScript --target es3 --module es6');
+    console.log(result.toString());
 
-    // node node_modules/.bin/tsc Source/Cesium.js --allowJs --outDir Build/TypeScript --target es6
-    // var plugins = [rollupTypescript({
-    //     tsconfig: './tsconfig.json',
-    //     include: ['Source/**/*.js', 'Source/**/*.ts']
-    // })];
+    var plugins = [];
 
     if (!debug) {
         plugins.push(rollupPluginStripPragma({
@@ -1054,8 +1052,12 @@ function combineWorkers(debug, optimizer, combineOutput) {
                 plugins.push(rollupPluginUglify.uglify());
             }
 
+            const command = `node node_modules/.bin/tsc ${files.join(' ')} --allowJs --outDir Build/TypeScript --target es3 --module es6`;
+            const result = child_process.execSync(command);
+            console.log(result.toString());
+
             return rollup.rollup({
-                input: files,
+                input: globby.sync(['Build/TypeScript/WorkersES6/*.js']),
                 plugins: plugins,
                 onwarn: rollupWarning
             }).then(function(bundle) {

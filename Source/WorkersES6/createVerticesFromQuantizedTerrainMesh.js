@@ -17,6 +17,9 @@ import TerrainProvider from '../Core/TerrainProvider.js';
 import Transforms from '../Core/Transforms.js';
 import WebMercatorProjection from '../Core/WebMercatorProjection.js';
 import createTaskProcessorWorker from './createTaskProcessorWorker.js';
+import helloTypescript from '../Core/helloTypescript';
+
+    helloTypescript(3, 'slurf!');
 
     var maxShort = 32767;
 
