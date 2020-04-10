@@ -793,7 +793,7 @@ gulp.task('test', function(done) {
 
     var files = [
         { pattern: 'Specs/karma-main.js', included: true, type: 'module' },
-        { pattern: 'Source/**', included: false, type: 'module' },
+        { pattern: 'Build/TypeScript/**', included: false, type: 'module' },
         { pattern: 'Specs/*.js', included: true, type: 'module' },
         { pattern: 'Specs/Core/**', included: true, type: 'module' },
         { pattern: 'Specs/Data/**', included: false },
@@ -1089,7 +1089,7 @@ function createCesiumJs() {
             assignmentName = '_shaders' + assignmentName;
         }
         assignmentName = assignmentName.replace(/(\.|-)/g, '_');
-        contents += 'export { default as ' + assignmentName + " } from './" + moduleId + "';" + os.EOL;
+        contents += 'export { default as ' + assignmentName + " } from './" + moduleId + ".js';" + os.EOL;
     });
 
     fs.writeFileSync('Source/Cesium.ts', contents);

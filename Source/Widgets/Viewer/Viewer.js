@@ -44,7 +44,7 @@ import SelectionIndicator from '../SelectionIndicator/SelectionIndicator.js';
 import subscribeAndEvaluate from '../subscribeAndEvaluate.js';
 import Timeline from '../Timeline/Timeline.js';
 import VRButton from '../VRButton/VRButton.js';
-import helloTypescript from '../../Core/helloTypescript';
+import helloTypescript from '../../Core/helloTypescript.js';
 
     var boundingSphereScratch = new BoundingSphere();
 
