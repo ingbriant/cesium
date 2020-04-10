@@ -39,6 +39,7 @@
   "devDependencies": {
     "@rollup/plugin-typescript": "^4.0.0",
     "aws-sdk": "^2.531.0",
+    "better-docs": "^1.4.7",
     "bluebird": "^3.4.6",
     "cloc": "^2.3.3",
     "compression": "^1.6.2",

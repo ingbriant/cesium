@@ -3,42 +3,60 @@ import defaultValue from './defaultValue.js';
 import defined from './defined.js';
 import DeveloperError from './DeveloperError.js';
 import CesiumMath from './Math.js';
+import Spherical from './Spherical.js';
+
+//Temporary code to avoid circular dependencies until the two below files are converted to TS
+// import Ellipsoid from './Ellipsoid.js';
+declare class Ellipsoid {
+    radiiSquared: Cartesian3;
+    static WGS84: Ellipsoid
+};
 
     /**
      * A 3D Cartesian point.
-     * @alias Cartesian3
-     * @constructor
-     *
-     * @param {Number} [x=0.0] The X component.
-     * @param {Number} [y=0.0] The Y component.
-     * @param {Number} [z=0.0] The Z component.
      *
      * @see Cartesian2
      * @see Cartesian4
      * @see Packable
      */
-    function Cartesian3(x, y, z) {
+    class Cartesian3 {
         /**
          * The X component.
-         * @type {Number}
          * @default 0.0
          */
-        this.x = defaultValue(x, 0.0);
+        x: number;
 
         /**
          * The Y component.
-         * @type {Number}
          * @default 0.0
          */
-        this.y = defaultValue(y, 0.0);
+        y: number;
 
         /**
          * The Z component.
-         * @type {Number}
          * @default 0.0
          */
-        this.z = defaultValue(z, 0.0);
-    }
+        z: number;
+
+        /**
+         * @param {Number} [x] The X component.
+         * @param {Number} [y] The Y component.
+         * @param {Number} [z] The Z component.
+         */
+        constructor(x = 0, y = 0, z = 0){
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+
+        static lerpScratch = new Cartesian3();
+        static angleBetweenScratch = new Cartesian3();
+        static angleBetweenScratch2 = new Cartesian3();
+        static mostOrthogonalAxisScratch = new Cartesian3();
+        static scratchN = new Cartesian3();
+        static scratchK = new Cartesian3();
+        static wgs84RadiiSquared = new Cartesian3(6378137.0 * 6378137.0, 6378137.0 * 6378137.0, 6356752.3142451793 * 6356752.3142451793);
+        static distanceScratch = new Cartesian3();
 
     /**
      * Converts the provided Spherical into Cartesian3 coordinates.
@@ -47,7 +65,7 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} [result] The object onto which to store the result.
      * @returns {Cartesian3} The modified result parameter or a new Cartesian3 instance if one was not provided.
      */
-    Cartesian3.fromSpherical = function(spherical, result) {
+    static fromSpherical(spherical: Spherical, result?: Cartesian3): Cartesian3 {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('spherical', spherical);
         //>>includeEnd('debug');
@@ -75,7 +93,7 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} [result] The object onto which to store the result.
      * @returns {Cartesian3} The modified result parameter or a new Cartesian3 instance if one was not provided.
      */
-    Cartesian3.fromElements = function(x, y, z, result) {
+    static fromElements(x: number, y: number, z: number, result?: Cartesian3): Cartesian3 {
         if (!defined(result)) {
             return new Cartesian3(x, y, z);
         }
@@ -89,11 +107,11 @@ import CesiumMath from './Math.js';
     /**
      * Duplicates a Cartesian3 instance.
      *
-     * @param {Cartesian3} cartesian The Cartesian to duplicate.
+     * @param {Cartesian3} [cartesian] The Cartesian to duplicate.
      * @param {Cartesian3} [result] The object onto which to store the result.
      * @returns {Cartesian3} The modified result parameter or a new Cartesian3 instance if one was not provided. (Returns undefined if cartesian is undefined)
      */
-    Cartesian3.clone = function(cartesian, result) {
+    static clone(cartesian?: Cartesian3, result?: Cartesian3): Cartesian3 {
         if (!defined(cartesian)) {
             return undefined;
         }
@@ -116,13 +134,13 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} [result] The object onto which to store the result.
      * @returns {Cartesian3} The modified result parameter or a new Cartesian3 instance if one was not provided.
      */
-    Cartesian3.fromCartesian4 = Cartesian3.clone;
+    static fromCartesian4 = Cartesian3.clone;
 
     /**
      * The number of elements used to pack the object into an array.
      * @type {Number}
      */
-    Cartesian3.packedLength = 3;
+    static packedLength: number = 3;
 
     /**
      * Stores the provided instance into the provided array.
@@ -133,13 +151,11 @@ import CesiumMath from './Math.js';
      *
      * @returns {Number[]} The array that was packed into
      */
-    Cartesian3.pack = function(value, array, startingIndex) {
+    static pack(value: Cartesian3, array: number[], startingIndex: number = 0): number[] {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('value', value);
         Check.defined('array', array);
         //>>includeEnd('debug');
-
-        startingIndex = defaultValue(startingIndex, 0);
 
         array[startingIndex++] = value.x;
         array[startingIndex++] = value.y;
@@ -156,12 +172,10 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} [result] The object into which to store the result.
      * @returns {Cartesian3} The modified result parameter or a new Cartesian3 instance if one was not provided.
      */
-    Cartesian3.unpack = function(array, startingIndex, result) {
+    static unpack(array: number[], startingIndex: number = 0, result?: Cartesian3): Cartesian3 {
         //>>includeStart('debug', pragmas.debug);
         Check.defined('array', array);
         //>>includeEnd('debug');
-
-        startingIndex = defaultValue(startingIndex, 0);
 
         if (!defined(result)) {
             result = new Cartesian3();
@@ -179,7 +193,7 @@ import CesiumMath from './Math.js';
      * @param {Number[]} [result] The array onto which to store the result. If this is a typed array, it must have array.length * 3 components, else a {@link DeveloperError} will be thrown. If it is a regular array, it will be resized to have (array.length * 3) elements.
      * @returns {Number[]} The packed array.
      */
-    Cartesian3.packArray = function(array, result) {
+    static packArray(array: Cartesian3[], result?: number[]): number[] {
         //>>includeStart('debug', pragmas.debug);
         Check.defined('array', array);
         //>>includeEnd('debug');
@@ -188,7 +202,7 @@ import CesiumMath from './Math.js';
         var resultLength = length * 3;
         if (!defined(result)) {
             result = new Array(resultLength);
-        } else if (!Array.isArray(result) && result.length !== resultLength) {
+        } else if (result.length !== resultLength) {
             throw new DeveloperError('If result is a typed array, it must have exactly array.length * 3 elements');
         } else if (result.length !== resultLength) {
             result.length = resultLength;
@@ -207,7 +221,7 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3[]} [result] The array onto which to store the result.
      * @returns {Cartesian3[]} The unpacked array.
      */
-    Cartesian3.unpackArray = function(array, result) {
+    static unpackArray(array: number[], result: Cartesian3[]): Cartesian3[] {
         //>>includeStart('debug', pragmas.debug);
         Check.defined('array', array);
         Check.typeOf.number.greaterThanOrEquals('array.length', array.length, 3);
@@ -248,7 +262,7 @@ import CesiumMath from './Math.js';
      * var v2 = [0.0, 0.0, 1.0, 2.0, 3.0];
      * var p2 = Cesium.Cartesian3.fromArray(v2, 2);
      */
-    Cartesian3.fromArray = Cartesian3.unpack;
+    static fromArray = Cartesian3.unpack;
 
     /**
      * Computes the value of the maximum component for the supplied Cartesian.
@@ -256,7 +270,7 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} cartesian The cartesian to use.
      * @returns {Number} The value of the maximum component.
      */
-    Cartesian3.maximumComponent = function(cartesian) {
+    static maximumComponent(cartesian: Cartesian3): number {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('cartesian', cartesian);
         //>>includeEnd('debug');
@@ -270,7 +284,7 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} cartesian The cartesian to use.
      * @returns {Number} The value of the minimum component.
      */
-    Cartesian3.minimumComponent = function(cartesian) {
+    static minimumComponent(cartesian: Cartesian3): number {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('cartesian', cartesian);
         //>>includeEnd('debug');
@@ -286,7 +300,7 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} result The object into which to store the result.
      * @returns {Cartesian3} A cartesian with the minimum components.
      */
-    Cartesian3.minimumByComponent = function(first, second, result) {
+    static minimumByComponent(first: Cartesian3, second: Cartesian3, result: Cartesian3): Cartesian3 {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('first', first);
         Check.typeOf.object('second', second);
@@ -308,7 +322,7 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} result The object into which to store the result.
      * @returns {Cartesian3} A cartesian with the maximum components.
      */
-    Cartesian3.maximumByComponent = function(first, second, result) {
+    static maximumByComponent(first: Cartesian3, second: Cartesian3, result: Cartesian3): Cartesian3 {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('first', first);
         Check.typeOf.object('second', second);
@@ -327,7 +341,7 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} cartesian The Cartesian instance whose squared magnitude is to be computed.
      * @returns {Number} The squared magnitude.
      */
-    Cartesian3.magnitudeSquared = function(cartesian) {
+    static magnitudeSquared(cartesian: Cartesian3): number {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('cartesian', cartesian);
         //>>includeEnd('debug');
@@ -341,11 +355,9 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} cartesian The Cartesian instance whose magnitude is to be computed.
      * @returns {Number} The magnitude.
      */
-    Cartesian3.magnitude = function(cartesian) {
+    static magnitude(cartesian: Cartesian3): number {
         return Math.sqrt(Cartesian3.magnitudeSquared(cartesian));
     };
-
-    var distanceScratch = new Cartesian3();
 
     /**
      * Computes the distance between two points.
@@ -358,14 +370,14 @@ import CesiumMath from './Math.js';
      * // Returns 1.0
      * var d = Cesium.Cartesian3.distance(new Cesium.Cartesian3(1.0, 0.0, 0.0), new Cesium.Cartesian3(2.0, 0.0, 0.0));
      */
-    Cartesian3.distance = function(left, right) {
+    static distance(left: Cartesian3, right: Cartesian3): number {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('left', left);
         Check.typeOf.object('right', right);
         //>>includeEnd('debug');
 
-        Cartesian3.subtract(left, right, distanceScratch);
-        return Cartesian3.magnitude(distanceScratch);
+        Cartesian3.subtract(left, right, Cartesian3.distanceScratch);
+        return Cartesian3.magnitude(Cartesian3.distanceScratch);
     };
 
     /**
@@ -380,14 +392,14 @@ import CesiumMath from './Math.js';
      * // Returns 4.0, not 2.0
      * var d = Cesium.Cartesian3.distanceSquared(new Cesium.Cartesian3(1.0, 0.0, 0.0), new Cesium.Cartesian3(3.0, 0.0, 0.0));
      */
-    Cartesian3.distanceSquared = function(left, right) {
+    static distanceSquared(left: Cartesian3, right: Cartesian3): number {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('left', left);
         Check.typeOf.object('right', right);
         //>>includeEnd('debug');
 
-        Cartesian3.subtract(left, right, distanceScratch);
-        return Cartesian3.magnitudeSquared(distanceScratch);
+        Cartesian3.subtract(left, right, Cartesian3.distanceScratch);
+        return Cartesian3.magnitudeSquared(Cartesian3.distanceScratch);
     };
 
     /**
@@ -397,7 +409,7 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} result The object onto which to store the result.
      * @returns {Cartesian3} The modified result parameter.
      */
-    Cartesian3.normalize = function(cartesian, result) {
+    static normalize(cartesian: Cartesian3, result: Cartesian3): Cartesian3 {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('cartesian', cartesian);
         Check.typeOf.object('result', result);
@@ -425,7 +437,7 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} right The second Cartesian.
      * @returns {Number} The dot product.
      */
-    Cartesian3.dot = function(left, right) {
+    static dot(left: Cartesian3, right: Cartesian3): number {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('left', left);
         Check.typeOf.object('right', right);
@@ -442,7 +454,7 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} result The object onto which to store the result.
      * @returns {Cartesian3} The modified result parameter.
      */
-    Cartesian3.multiplyComponents = function(left, right, result) {
+    static multiplyComponents(left: Cartesian3, right: Cartesian3, result: Cartesian3): Cartesian3 {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('left', left);
         Check.typeOf.object('right', right);
@@ -463,7 +475,7 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} result The object onto which to store the result.
      * @returns {Cartesian3} The modified result parameter.
      */
-    Cartesian3.divideComponents = function(left, right, result) {
+    static divideComponents(left: Cartesian3, right: Cartesian3, result: Cartesian3): Cartesian3 {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('left', left);
         Check.typeOf.object('right', right);
@@ -484,7 +496,7 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} result The object onto which to store the result.
      * @returns {Cartesian3} The modified result parameter.
      */
-    Cartesian3.add = function(left, right, result) {
+    static add(left: Cartesian3, right: Cartesian3, result: Cartesian3): Cartesian3 {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('left', left);
         Check.typeOf.object('right', right);
@@ -505,7 +517,7 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} result The object onto which to store the result.
      * @returns {Cartesian3} The modified result parameter.
      */
-    Cartesian3.subtract = function(left, right, result) {
+    static subtract(left: Cartesian3, right: Cartesian3, result: Cartesian3): Cartesian3 {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('left', left);
         Check.typeOf.object('right', right);
@@ -526,7 +538,7 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} result The object onto which to store the result.
      * @returns {Cartesian3} The modified result parameter.
      */
-    Cartesian3.multiplyByScalar = function(cartesian, scalar, result) {
+    static multiplyByScalar(cartesian: Cartesian3, scalar: number, result: Cartesian3): Cartesian3 {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('cartesian', cartesian);
         Check.typeOf.number('scalar', scalar);
@@ -547,7 +559,7 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} result The object onto which to store the result.
      * @returns {Cartesian3} The modified result parameter.
      */
-    Cartesian3.divideByScalar = function(cartesian, scalar, result) {
+    static divideByScalar(cartesian: Cartesian3, scalar: number, result: Cartesian3): Cartesian3 {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('cartesian', cartesian);
         Check.typeOf.number('scalar', scalar);
@@ -567,7 +579,7 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} result The object onto which to store the result.
      * @returns {Cartesian3} The modified result parameter.
      */
-    Cartesian3.negate = function(cartesian, result) {
+    static negate(cartesian: Cartesian3, result: Cartesian3): Cartesian3 {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('cartesian', cartesian);
         Check.typeOf.object('result', result);
@@ -586,7 +598,7 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} result The object onto which to store the result.
      * @returns {Cartesian3} The modified result parameter.
      */
-    Cartesian3.abs = function(cartesian, result) {
+    static abs(cartesian: Cartesian3, result: Cartesian3): Cartesian3 {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('cartesian', cartesian);
         Check.typeOf.object('result', result);
@@ -598,7 +610,6 @@ import CesiumMath from './Math.js';
         return result;
     };
 
-    var lerpScratch = new Cartesian3();
     /**
      * Computes the linear interpolation or extrapolation at t using the provided cartesians.
      *
@@ -608,7 +619,7 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} result The object onto which to store the result.
      * @returns {Cartesian3} The modified result parameter.
      */
-    Cartesian3.lerp = function(start, end, t, result) {
+    static lerp(start: Cartesian3, end: Cartesian3, t: number, result: Cartesian3): Cartesian3 {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('start', start);
         Check.typeOf.object('end', end);
@@ -616,13 +627,11 @@ import CesiumMath from './Math.js';
         Check.typeOf.object('result', result);
         //>>includeEnd('debug');
 
-        Cartesian3.multiplyByScalar(end, t, lerpScratch);
+        Cartesian3.multiplyByScalar(end, t, Cartesian3.lerpScratch);
         result = Cartesian3.multiplyByScalar(start, 1.0 - t, result);
-        return Cartesian3.add(lerpScratch, result, result);
+        return Cartesian3.add(Cartesian3.lerpScratch, result, result);
     };
 
-    var angleBetweenScratch = new Cartesian3();
-    var angleBetweenScratch2 = new Cartesian3();
     /**
      * Returns the angle, in radians, between the provided Cartesians.
      *
@@ -630,20 +639,19 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} right The second Cartesian.
      * @returns {Number} The angle between the Cartesians.
      */
-    Cartesian3.angleBetween = function(left, right) {
+    static angleBetween(left: Cartesian3, right: Cartesian3): number {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('left', left);
         Check.typeOf.object('right', right);
         //>>includeEnd('debug');
 
-        Cartesian3.normalize(left, angleBetweenScratch);
-        Cartesian3.normalize(right, angleBetweenScratch2);
-        var cosine = Cartesian3.dot(angleBetweenScratch, angleBetweenScratch2);
-        var sine = Cartesian3.magnitude(Cartesian3.cross(angleBetweenScratch, angleBetweenScratch2, angleBetweenScratch));
+        Cartesian3.normalize(left, Cartesian3.angleBetweenScratch);
+        Cartesian3.normalize(right, Cartesian3.angleBetweenScratch2);
+        var cosine = Cartesian3.dot(Cartesian3.angleBetweenScratch, Cartesian3.angleBetweenScratch2);
+        var sine = Cartesian3.magnitude(Cartesian3.cross(Cartesian3.angleBetweenScratch, Cartesian3.angleBetweenScratch2, Cartesian3.angleBetweenScratch));
         return Math.atan2(sine, cosine);
     };
 
-    var mostOrthogonalAxisScratch = new Cartesian3();
     /**
      * Returns the axis that is most orthogonal to the provided Cartesian.
      *
@@ -651,13 +659,13 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} result The object onto which to store the result.
      * @returns {Cartesian3} The most orthogonal axis.
      */
-    Cartesian3.mostOrthogonalAxis = function(cartesian, result) {
+    static mostOrthogonalAxis(cartesian: Cartesian3, result: Cartesian3): Cartesian3 {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('cartesian', cartesian);
         Check.typeOf.object('result', result);
         //>>includeEnd('debug');
 
-        var f = Cartesian3.normalize(cartesian, mostOrthogonalAxisScratch);
+        var f = Cartesian3.normalize(cartesian, Cartesian3.mostOrthogonalAxisScratch);
         Cartesian3.abs(f, f);
 
         if (f.x <= f.y) {
@@ -682,7 +690,7 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} result The result cartesian
      * @returns {Cartesian3} The modified result parameter
      */
-    Cartesian3.projectVector = function(a, b, result) {
+    static projectVector(a: Cartesian3, b: Cartesian3, result: Cartesian3): Cartesian3 {
         //>>includeStart('debug', pragmas.debug);
         Check.defined('a', a);
         Check.defined('b', b);
@@ -701,7 +709,7 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} [right] The second Cartesian.
      * @returns {Boolean} <code>true</code> if left and right are equal, <code>false</code> otherwise.
      */
-    Cartesian3.equals = function(left, right) {
+    static equals(left: Cartesian3, right: Cartesian3): boolean {
             return (left === right) ||
               ((defined(left)) &&
                (defined(right)) &&
@@ -713,7 +721,7 @@ import CesiumMath from './Math.js';
     /**
      * @private
      */
-    Cartesian3.equalsArray = function(cartesian, array, offset) {
+    static equalsArray(cartesian : Cartesian3, array : number[], offset: number) {
         return cartesian.x === array[offset] &&
                cartesian.y === array[offset + 1] &&
                cartesian.z === array[offset + 2];
@@ -726,11 +734,11 @@ import CesiumMath from './Math.js';
      *
      * @param {Cartesian3} [left] The first Cartesian.
      * @param {Cartesian3} [right] The second Cartesian.
-     * @param {Number} relativeEpsilon The relative epsilon tolerance to use for equality testing.
+     * @param {Number} [relativeEpsilon] The relative epsilon tolerance to use for equality testing.
      * @param {Number} [absoluteEpsilon=relativeEpsilon] The absolute epsilon tolerance to use for equality testing.
      * @returns {Boolean} <code>true</code> if left and right are within the provided epsilon, <code>false</code> otherwise.
      */
-    Cartesian3.equalsEpsilon = function(left, right, relativeEpsilon, absoluteEpsilon) {
+    static equalsEpsilon(left?: Cartesian3, right?: Cartesian3, relativeEpsilon?: number, absoluteEpsilon?: number): boolean {
         return (left === right) ||
                (defined(left) &&
                 defined(right) &&
@@ -747,7 +755,7 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} result The object onto which to store the result.
      * @returns {Cartesian3} The cross product.
      */
-    Cartesian3.cross = function(left, right, result) {
+    static cross(left: Cartesian3, right: Cartesian3, result: Cartesian3): Cartesian3 {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('left', left);
         Check.typeOf.object('right', right);
@@ -778,7 +786,7 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} result The object onto which to store the result.
      * @returns {Cartesian3} The midpoint.
      */
-    Cartesian3.midpoint = function(left, right, result) {
+    static midpoint(left: Cartesian3, right: Cartesian3, result: Cartesian3): Cartesian3 {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('left', left);
         Check.typeOf.object('right', right);
@@ -805,7 +813,7 @@ import CesiumMath from './Math.js';
      * @example
      * var position = Cesium.Cartesian3.fromDegrees(-115.0, 37.0);
      */
-    Cartesian3.fromDegrees = function(longitude, latitude, height, ellipsoid, result) {
+    static fromDegrees(longitude: number, latitude: number, height: number = 0, ellipsoid: Ellipsoid = Ellipsoid.WGS84, result?: Cartesian3): Cartesian3 {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.number('longitude', longitude);
         Check.typeOf.number('latitude', latitude);
@@ -815,10 +823,6 @@ import CesiumMath from './Math.js';
         latitude = CesiumMath.toRadians(latitude);
         return Cartesian3.fromRadians(longitude, latitude, height, ellipsoid, result);
     };
-
-    var scratchN = new Cartesian3();
-    var scratchK = new Cartesian3();
-    var wgs84RadiiSquared = new Cartesian3(6378137.0 * 6378137.0, 6378137.0 * 6378137.0, 6356752.3142451793 * 6356752.3142451793);
 
     /**
      * Returns a Cartesian3 position from longitude and latitude values given in radians.
@@ -833,30 +837,30 @@ import CesiumMath from './Math.js';
      * @example
      * var position = Cesium.Cartesian3.fromRadians(-2.007, 0.645);
      */
-    Cartesian3.fromRadians = function(longitude, latitude, height, ellipsoid, result) {
+    static fromRadians(longitude: number, latitude: number, height: number = 0, ellipsoid: Ellipsoid = Ellipsoid.WGS84, result?: Cartesian3): Cartesian3 {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.number('longitude', longitude);
         Check.typeOf.number('latitude', latitude);
         //>>includeEnd('debug');
 
         height = defaultValue(height, 0.0);
-        var radiiSquared = defined(ellipsoid) ? ellipsoid.radiiSquared : wgs84RadiiSquared;
+        var radiiSquared = defined(ellipsoid) ? ellipsoid.radiiSquared : Cartesian3.wgs84RadiiSquared;
 
         var cosLatitude = Math.cos(latitude);
-        scratchN.x = cosLatitude * Math.cos(longitude);
-        scratchN.y = cosLatitude * Math.sin(longitude);
-        scratchN.z = Math.sin(latitude);
-        scratchN = Cartesian3.normalize(scratchN, scratchN);
+        Cartesian3.scratchN.x = cosLatitude * Math.cos(longitude);
+        Cartesian3.scratchN.y = cosLatitude * Math.sin(longitude);
+        Cartesian3.scratchN.z = Math.sin(latitude);
+        Cartesian3.scratchN = Cartesian3.normalize(Cartesian3.scratchN, Cartesian3.scratchN);
 
-        Cartesian3.multiplyComponents(radiiSquared, scratchN, scratchK);
-        var gamma = Math.sqrt(Cartesian3.dot(scratchN, scratchK));
-        scratchK = Cartesian3.divideByScalar(scratchK, gamma, scratchK);
-        scratchN = Cartesian3.multiplyByScalar(scratchN, height, scratchN);
+        Cartesian3.multiplyComponents(radiiSquared, Cartesian3.scratchN, Cartesian3.scratchK);
+        var gamma = Math.sqrt(Cartesian3.dot(Cartesian3.scratchN, Cartesian3.scratchK));
+        Cartesian3.scratchK = Cartesian3.divideByScalar(Cartesian3.scratchK, gamma, Cartesian3.scratchK);
+        Cartesian3.scratchN = Cartesian3.multiplyByScalar(Cartesian3.scratchN, height, Cartesian3.scratchN);
 
         if (!defined(result)) {
             result = new Cartesian3();
         }
-        return Cartesian3.add(scratchK, scratchN, result);
+        return Cartesian3.add(Cartesian3.scratchK, Cartesian3.scratchN, result);
     };
 
     /**
@@ -870,7 +874,7 @@ import CesiumMath from './Math.js';
      * @example
      * var positions = Cesium.Cartesian3.fromDegreesArray([-115.0, 37.0, -107.0, 33.0]);
      */
-    Cartesian3.fromDegreesArray = function(coordinates, ellipsoid, result) {
+    static fromDegreesArray(coordinates: number[], ellipsoid: Ellipsoid = Ellipsoid.WGS84, result?: Cartesian3[]): Cartesian3[] {
         //>>includeStart('debug', pragmas.debug);
         Check.defined('coordinates', coordinates);
         if (coordinates.length < 2 || coordinates.length % 2 !== 0) {
@@ -906,7 +910,7 @@ import CesiumMath from './Math.js';
      * @example
      * var positions = Cesium.Cartesian3.fromRadiansArray([-2.007, 0.645, -1.867, .575]);
      */
-    Cartesian3.fromRadiansArray = function(coordinates, ellipsoid, result) {
+    static fromRadiansArray(coordinates: number[], ellipsoid: Ellipsoid = Ellipsoid.WGS84, result?: Cartesian3[]): Cartesian3[] {
         //>>includeStart('debug', pragmas.debug);
         Check.defined('coordinates', coordinates);
         if (coordinates.length < 2 || coordinates.length % 2 !== 0) {
@@ -942,7 +946,7 @@ import CesiumMath from './Math.js';
      * @example
      * var positions = Cesium.Cartesian3.fromDegreesArrayHeights([-115.0, 37.0, 100000.0, -107.0, 33.0, 150000.0]);
      */
-    Cartesian3.fromDegreesArrayHeights = function(coordinates, ellipsoid, result) {
+    static fromDegreesArrayHeights(coordinates: number[], ellipsoid: Ellipsoid = Ellipsoid.WGS84, result?: Cartesian3[]): Cartesian3[] {
         //>>includeStart('debug', pragmas.debug);
         Check.defined('coordinates', coordinates);
         if (coordinates.length < 3 || coordinates.length % 3 !== 0) {
@@ -979,7 +983,7 @@ import CesiumMath from './Math.js';
      * @example
      * var positions = Cesium.Cartesian3.fromRadiansArrayHeights([-2.007, 0.645, 100000.0, -1.867, .575, 150000.0]);
      */
-    Cartesian3.fromRadiansArrayHeights = function(coordinates, ellipsoid, result) {
+    static fromRadiansArrayHeights(coordinates: number[], ellipsoid: Ellipsoid = Ellipsoid.WGS84, result?: Cartesian3[]): Cartesian3[] {
         //>>includeStart('debug', pragmas.debug);
         Check.defined('coordinates', coordinates);
         if (coordinates.length < 3 || coordinates.length % 3 !== 0) {
@@ -1011,7 +1015,7 @@ import CesiumMath from './Math.js';
      * @type {Cartesian3}
      * @constant
      */
-    Cartesian3.ZERO = Object.freeze(new Cartesian3(0.0, 0.0, 0.0));
+    static ZERO: Cartesian3 = Object.freeze(new Cartesian3(0.0, 0.0, 0.0));
 
     /**
      * An immutable Cartesian3 instance initialized to (1.0, 0.0, 0.0).
@@ -1019,7 +1023,7 @@ import CesiumMath from './Math.js';
      * @type {Cartesian3}
      * @constant
      */
-    Cartesian3.UNIT_X = Object.freeze(new Cartesian3(1.0, 0.0, 0.0));
+    static UNIT_X: Cartesian3 = Object.freeze(new Cartesian3(1.0, 0.0, 0.0));
 
     /**
      * An immutable Cartesian3 instance initialized to (0.0, 1.0, 0.0).
@@ -1027,7 +1031,7 @@ import CesiumMath from './Math.js';
      * @type {Cartesian3}
      * @constant
      */
-    Cartesian3.UNIT_Y = Object.freeze(new Cartesian3(0.0, 1.0, 0.0));
+    static UNIT_Y: Cartesian3 = Object.freeze(new Cartesian3(0.0, 1.0, 0.0));
 
     /**
      * An immutable Cartesian3 instance initialized to (0.0, 0.0, 1.0).
@@ -1035,7 +1039,7 @@ import CesiumMath from './Math.js';
      * @type {Cartesian3}
      * @constant
      */
-    Cartesian3.UNIT_Z = Object.freeze(new Cartesian3(0.0, 0.0, 1.0));
+    static UNIT_Z: Cartesian3 = Object.freeze(new Cartesian3(0.0, 0.0, 1.0));
 
     /**
      * Duplicates this Cartesian3 instance.
@@ -1043,7 +1047,7 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} [result] The object onto which to store the result.
      * @returns {Cartesian3} The modified result parameter or a new Cartesian3 instance if one was not provided.
      */
-    Cartesian3.prototype.clone = function(result) {
+    clone(result?: Cartesian3): Cartesian3 {
         return Cartesian3.clone(this, result);
     };
 
@@ -1054,7 +1058,7 @@ import CesiumMath from './Math.js';
      * @param {Cartesian3} [right] The right hand side Cartesian.
      * @returns {Boolean} <code>true</code> if they are equal, <code>false</code> otherwise.
      */
-    Cartesian3.prototype.equals = function(right) {
+    equals(right?: Cartesian3): boolean {
         return Cartesian3.equals(this, right);
     };
 
@@ -1064,11 +1068,11 @@ import CesiumMath from './Math.js';
      * <code>false</code> otherwise.
      *
      * @param {Cartesian3} [right] The right hand side Cartesian.
-     * @param {Number} relativeEpsilon The relative epsilon tolerance to use for equality testing.
+     * @param {Number} [relativeEpsilon] The relative epsilon tolerance to use for equality testing.
      * @param {Number} [absoluteEpsilon=relativeEpsilon] The absolute epsilon tolerance to use for equality testing.
      * @returns {Boolean} <code>true</code> if they are within the provided epsilon, <code>false</code> otherwise.
      */
-    Cartesian3.prototype.equalsEpsilon = function(right, relativeEpsilon, absoluteEpsilon) {
+    equalsEpsilon(right?: Cartesian3, relativeEpsilon?: number, absoluteEpsilon?: number): boolean {
         return Cartesian3.equalsEpsilon(this, right, relativeEpsilon, absoluteEpsilon);
     };
 
@@ -1077,7 +1081,9 @@ import CesiumMath from './Math.js';
      *
      * @returns {String} A string representing this Cartesian in the format '(x, y, z)'.
      */
-    Cartesian3.prototype.toString = function() {
+    toString(): string {
         return '(' + this.x + ', ' + this.y + ', ' + this.z + ')';
     };
-export default Cartesian3;
+    }
+
+    export default Cartesian3;

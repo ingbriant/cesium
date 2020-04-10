@@ -44,7 +44,6 @@ import SelectionIndicator from '../SelectionIndicator/SelectionIndicator.js';
 import subscribeAndEvaluate from '../subscribeAndEvaluate.js';
 import Timeline from '../Timeline/Timeline.js';
 import VRButton from '../VRButton/VRButton.js';
-import helloTypescript from '../../Core/helloTypescript.js';
 
     var boundingSphereScratch = new BoundingSphere();
 
@@ -306,8 +305,6 @@ import helloTypescript from '../../Core/helloTypescript.js';
             throw new DeveloperError('container is required.');
         }
         //>>includeEnd('debug');
-
-        helloTypescript(new Cartesian3(1, 2, 3), 'two');
 
         container = getElement(container);
         options = defaultValue(options, defaultValue.EMPTY_OBJECT);
