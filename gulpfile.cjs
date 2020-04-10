@@ -33,7 +33,7 @@ var rollup = require('rollup');
 var rollupPluginStripPragma = require('rollup-plugin-strip-pragma');
 var rollupPluginExternalGlobals = require('rollup-plugin-external-globals');
 var rollupPluginUglify = require('rollup-plugin-uglify');
-//var rollupTypescript = require('@rollup/plugin-typescript');
+var rollupTypescript = require('@rollup/plugin-typescript');
 var cleanCSS = require('gulp-clean-css');
 
 var packageJson = require('./package.json');
@@ -61,6 +61,7 @@ if (!concurrency) {
 var sourceFiles = ['Source/**/*.js',
                    'Source/**/*.ts',
                    '!Source/*.js',
+                   '!Source/*.ts',
                    '!Source/Workers/**',
                    '!Source/WorkersES6/**',
                    'Source/WorkersES6/createTaskProcessorWorker.js',
@@ -70,7 +71,7 @@ var sourceFiles = ['Source/**/*.js',
                    '!Source/ThirdParty/crunch.js'];
 
 var watchedFiles = ['Source/**/*.js',
-                    '!Source/Cesium.js',
+                    '!Source/Cesium.ts',
                     '!Source/Build/**',
                     '!Source/Shaders/**/*.js',
                     'Source/Shaders/**/*.glsl',
@@ -81,7 +82,7 @@ var watchedFiles = ['Source/**/*.js',
                     'Source/Workers/transferTypedArrayTest.js',
                     '!Specs/SpecList.js'];
 
-var filesToClean = ['Source/Cesium.js',
+var filesToClean = ['Source/Cesium.ts',
                     'Source/Shaders/**/*.js',
                     'Source/Workers/**',
                     '!Source/Workers/cesiumWorkerBootstrapper.js',
@@ -93,21 +94,6 @@ var filesToClean = ['Source/Cesium.js',
                     'Apps/Sandcastle/templates/bucket.css',
                     'Cesium-*.zip',
                     'cesium-*.tgz'];
-
-var filesToConvertES6 = ['Source/**/*.js',
-                         'Specs/**/*.js',
-                         '!Source/ThirdParty/**',
-                         '!Source/Cesium.js',
-                         '!Source/copyrightHeader.js',
-                         '!Source/Shaders/**',
-                         '!Source/Workers/cesiumWorkerBootstrapper.js',
-                         '!Source/Workers/transferTypedArrayTest.js',
-                         '!Specs/karma-main.js',
-                         '!Specs/karma.conf.js',
-                         '!Specs/spec-main.js',
-                         '!Specs/SpecList.js',
-                         '!Specs/TestWorkers/**'
-                        ];
 
 function rollupWarning(message) {
     // Ignore eval warnings in third-party code we don't have control over
@@ -156,13 +142,12 @@ gulp.task('build', function() {
     mkdirp.sync('Build');
     fs.writeFileSync('Build/package.json', JSON.stringify({
         type: 'commonjs'
-    }), "utf8");
+    }), 'utf8');
     glslToJavaScript(minifyShaders, 'Build/minifyShaders.state');
     createCesiumJs();
     createSpecList();
     createJsHintOptions();
-    //return Promise.join(createWorkers(), createGalleryList());
-    return Promise.resolve();
+    return Promise.join(/*createWorkers(),*/ createGalleryList());
 });
 
 gulp.task('build-watch', function() {
@@ -854,142 +839,12 @@ gulp.task('test', function(done) {
     karma.start();
 });
 
-gulp.task('convertToModules', function() {
-    var requiresRegex = /([\s\S]*?(define|defineSuite|require)\((?:{[\s\S]*}, )?\[)([\S\s]*?)]([\s\S]*?function\s*)\(([\S\s]*?)\) {([\s\S]*)/;
-    var noModulesRegex = /([\s\S]*?(define|defineSuite|require)\((?:{[\s\S]*}, )?\[?)([\S\s]*?)]?([\s\S]*?function\s*)\(([\S\s]*?)\) {([\s\S]*)/;
-    var splitRegex = /,\s*/;
-
-    var fsReadFile = Promise.promisify(fs.readFile);
-    var fsWriteFile = Promise.promisify(fs.writeFile);
-
-    var files = globby.sync(filesToConvertES6);
-
-    return Promise.map(files, function(file) {
-        return fsReadFile(file).then(function(contents) {
-            contents = contents.toString();
-            if (contents.startsWith('import')) {
-                return;
-            }
-
-            var result = requiresRegex.exec(contents);
-
-            if (result === null) {
-                result = noModulesRegex.exec(contents);
-                if (result === null) {
-                    return;
-                }
-            }
-
-            var names = result[3].split(splitRegex);
-            if (names.length === 1 && names[0].trim() === '') {
-                names.length = 0;
-            }
-
-            var i;
-            for (i = 0; i < names.length; ++i) {
-                if (names[i].indexOf('//') >= 0 || names[i].indexOf('/*') >= 0) {
-                    console.log(file + ' contains comments in the require list.  Skipping so nothing gets broken.');
-                    return;
-                }
-            }
-
-            var identifiers = result[5].split(splitRegex);
-            if (identifiers.length === 1 && identifiers[0].trim() === '') {
-                identifiers.length = 0;
-            }
-
-            for (i = 0; i < identifiers.length; ++i) {
-                if (identifiers[i].indexOf('//') >= 0 || identifiers[i].indexOf('/*') >= 0) {
-                    console.log(file + ' contains comments in the require list.  Skipping so nothing gets broken.');
-                    return;
-                }
-            }
-
-            var requires = [];
-
-            for (i = 0; i < names.length && i < identifiers.length; ++i) {
-                requires.push({
-                    name : names[i].trim(),
-                    identifier : identifiers[i].trim()
-                });
-            }
-
-            // Convert back to separate lists for the names and identifiers, and add
-            // any additional names or identifiers that don't have a corresponding pair.
-            var sortedNames = requires.map(function(item) {
-                return item.name.slice(0, -1) + '.js\'';
-            });
-            for (i = sortedNames.length; i < names.length; ++i) {
-                sortedNames.push(names[i].trim());
-            }
-
-            var sortedIdentifiers = requires.map(function(item) {
-                return item.identifier;
-            });
-            for (i = sortedIdentifiers.length; i < identifiers.length; ++i) {
-                sortedIdentifiers.push(identifiers[i].trim());
-            }
-
-            contents = '';
-            if (sortedNames.length > 0) {
-                for (var q = 0; q < sortedNames.length; q++) {
-                    var modulePath = sortedNames[q];
-                    if (file.startsWith('Specs')) {
-                        modulePath = modulePath.substring(1, modulePath.length - 1);
-                        var sourceDir = path.dirname(file);
-
-                        if (modulePath.startsWith('Specs') || modulePath.startsWith('.')) {
-                            var importPath = modulePath;
-                            if (modulePath.startsWith('Specs')) {
-                                importPath = path.relative(sourceDir, modulePath);
-                                if (importPath[0] !== '.') {
-                                    importPath = './' + importPath;
-                                }
-                            }
-                            modulePath = '\'' + importPath + '\'';
-                            contents += 'import ' + sortedIdentifiers[q] + ' from ' + modulePath + ';' + os.EOL;
-                        } else {
-                            modulePath = '\'' + path.relative(sourceDir, 'Source') + '/Cesium.js' + '\'';
-                            if (sortedIdentifiers[q] === 'CesiumMath') {
-                                contents += 'import { Math as CesiumMath } from ' + modulePath + ';' + os.EOL;
-                            } else {
-                                contents += 'import { ' + sortedIdentifiers[q] + ' } from ' + modulePath + ';' + os.EOL;
-                            }
-                        }
-                    } else {
-                        contents += 'import ' + sortedIdentifiers[q] + ' from ' + modulePath + ';' + os.EOL;
-                    }
-                }
-            }
-
-            var code;
-            var codeAndReturn = result[6];
-            if (file.endsWith('Spec.js')) {
-                var indi = codeAndReturn.lastIndexOf('});');
-                code = codeAndReturn.slice(0, indi);
-                code = code.trim().replace("'use strict';" + os.EOL, '');
-                contents += code + os.EOL;
-            } else {
-                var returnIndex = codeAndReturn.lastIndexOf('return');
-
-                code = codeAndReturn.slice(0, returnIndex);
-                code = code.trim().replace("'use strict';" + os.EOL, '');
-                contents += code + os.EOL;
-
-                var returnStatement = codeAndReturn.slice(returnIndex);
-                contents += returnStatement.split(';')[0].replace('return ', 'export default ') + ';' + os.EOL;
-            }
-
-            return fsWriteFile(file, contents);
-        });
-    });
-});
-
 function combineCesium(debug, optimizer, combineOutput) {
-    const result = child_process.execSync('node node_modules/.bin/tsc Source/Cesium.js --allowJs --outDir Build/TypeScript --target es3 --module es6');
-    console.log(result.toString());
-
     var plugins = [];
+
+    plugins.push(rollupTypescript({
+        exclude: ['node_modules/**', 'Build/**']
+    }));
 
     if (!debug) {
         plugins.push(rollupPluginStripPragma({
@@ -1001,7 +856,7 @@ function combineCesium(debug, optimizer, combineOutput) {
     }
 
     return rollup.rollup({
-        input: 'Build/TypeScript/Cesium.js',
+        input: 'Source/Cesium.ts',
         plugins: plugins,
         onwarn: rollupWarning
     }).then(function(bundle) {
@@ -1044,6 +899,10 @@ function combineWorkers(debug, optimizer, combineOutput) {
         .then(function(files) {
             var plugins = [];
 
+            plugins.push(rollupTypescript({
+                exclude: ['node_modules/**', 'Build/**']
+            }));
+
             if (!debug) {
                 plugins.push(rollupPluginStripPragma({
                     pragmas: ['debug']
@@ -1053,12 +912,8 @@ function combineWorkers(debug, optimizer, combineOutput) {
                 plugins.push(rollupPluginUglify.uglify());
             }
 
-            const command = `node node_modules/.bin/tsc ${files.join(' ')} --allowJs --outDir Build/TypeScript --target es3 --module es6`;
-            const result = child_process.execSync(command);
-            console.log(result.toString());
-
             return rollup.rollup({
-                input: globby.sync(['Build/TypeScript/WorkersES6/*.js']),
+                input: files,
                 plugins: plugins,
                 onwarn: rollupWarning
             }).then(function(bundle) {
@@ -1108,7 +963,7 @@ function combineJavaScript(options) {
 
         promises.push(streamToPromise(stream));
 
-        var everythingElse = ['Source/**', '!**/*.js', '!**/*.glsl'];
+        var everythingElse = ['Source/**', '!**/*.js', '!**/*.ts', '!**/*.glsl'];
         if (optimizer === 'uglify2') {
             promises.push(minifyCSS(outputDirectory));
             everythingElse.push('!**/*.css');
@@ -1235,7 +1090,7 @@ function createCesiumJs() {
         contents += 'export { default as ' + assignmentName + " } from './" + moduleId + "';" + os.EOL;
     });
 
-    fs.writeFileSync('Source/Cesium.js', contents);
+    fs.writeFileSync('Source/Cesium.ts', contents);
 }
 
 function createSpecList() {
