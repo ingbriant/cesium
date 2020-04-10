@@ -19,7 +19,7 @@ import WebMercatorProjection from '../Core/WebMercatorProjection.js';
 import createTaskProcessorWorker from './createTaskProcessorWorker.js';
 import helloTypescript from '../Core/helloTypescript';
 
-    helloTypescript(3, 'slurf!');
+    helloTypescript(new Cartesian3(4, 5, 6), 'squirrel!');
 
     var maxShort = 32767;
 

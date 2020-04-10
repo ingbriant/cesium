@@ -3,8 +3,8 @@
         "allowUnknownTags": false
     },
     "source": {
-        "include": ["Source"],
-        "exclude": ["Source/ThirdParty", "Source/Workers"],
+        "include": ["Build/TypeScript"],
+        "exclude": ["Build/TypeScript/ThirdParty", "Build/TypeScript/Workers"],
         "includePattern": ".+\\.js(doc)?$",
         "excludePattern": "(^|\\/|\\\\)_"
     },

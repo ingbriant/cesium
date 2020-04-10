@@ -59,6 +59,7 @@ if (!concurrency) {
 }
 
 var sourceFiles = ['Source/**/*.js',
+                   'Source/**/*.ts',
                    '!Source/*.js',
                    '!Source/Workers/**',
                    '!Source/WorkersES6/**',
@@ -1231,7 +1232,7 @@ function createCesiumJs() {
             assignmentName = '_shaders' + assignmentName;
         }
         assignmentName = assignmentName.replace(/(\.|-)/g, '_');
-        contents += 'export { default as ' + assignmentName + " } from './" + moduleId + ".js';" + os.EOL;
+        contents += 'export { default as ' + assignmentName + " } from './" + moduleId + "';" + os.EOL;
     });
 
     fs.writeFileSync('Source/Cesium.js', contents);

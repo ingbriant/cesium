@@ -307,7 +307,7 @@ import helloTypescript from '../../Core/helloTypescript';
         }
         //>>includeEnd('debug');
 
-        helloTypescript(1, 'two');
+        helloTypescript(new Cartesian3(1, 2, 3), 'two');
 
         container = getElement(container);
         options = defaultValue(options, defaultValue.EMPTY_OBJECT);
