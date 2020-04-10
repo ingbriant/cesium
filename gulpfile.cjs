@@ -286,6 +286,8 @@ gulp.task('combineRelease', gulp.series('build', combineRelease));
 function generateDocumentation() {
     var envPathSeperator = os.platform() === 'win32' ? ';' : ':';
 
+    child_process.execSync('node node_modules/.bin/tsc Source/Cesium.ts --allowJs --outDir Build/TypeScript --target es3 --module es6');
+
     return new Promise(function(resolve, reject) {
         child_process.exec('jsdoc --configure Tools/jsdoc/conf.json', {
             env : {
