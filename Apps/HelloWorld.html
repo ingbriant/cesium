@@ -20,6 +20,7 @@
   <div id="cesiumContainer"></div>
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer');
+    viewer.extend(Cesium.viewerDragDropMixin);
   </script>
 </body>
 </html>

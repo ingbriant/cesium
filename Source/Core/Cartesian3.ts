@@ -50,7 +50,6 @@ declare class Ellipsoid {
         constructor(public x: number = 0, public y: number = 0, public z: number = 0){
         }
 
-
     /**
      * Converts the provided Spherical into Cartesian3 coordinates.
      *
@@ -75,7 +74,7 @@ declare class Ellipsoid {
         result.y = radial * Math.sin(clock);
         result.z = magnitude * Math.cos(cone);
         return result;
-    };
+    }
 
     /**
      * Creates a Cartesian3 instance from x, y and z coordinates.
@@ -95,7 +94,7 @@ declare class Ellipsoid {
         result.y = y;
         result.z = z;
         return result;
-    };
+    }
 
     /**
      * Duplicates a Cartesian3 instance.
@@ -116,7 +115,7 @@ declare class Ellipsoid {
         result.y = cartesian.y;
         result.z = cartesian.z;
         return result;
-    };
+    }
 
     /**
      * Creates a Cartesian3 instance from an existing Cartesian4.  This simply takes the
@@ -129,13 +128,13 @@ declare class Ellipsoid {
      */
     static fromCartesian4(cartesian?: Cartesian3, result?: Cartesian3): Cartesian3 {
         return Cartesian3.clone(cartesian, result);
-    };
+    }
 
     /**
      * The number of elements used to pack the object into an array.
      * @type {Number}
      */
-    static packedLength: number = 3;
+    static packedLength = 3;
 
     /**
      * Stores the provided instance into the provided array.
@@ -146,7 +145,7 @@ declare class Ellipsoid {
      *
      * @returns {Number[]} The array that was packed into
      */
-    static pack(value: Cartesian3, array: number[], startingIndex: number = 0): number[] {
+    static pack(value: Cartesian3, array: number[], startingIndex = 0): number[] {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('value', value);
         Check.defined('array', array);
@@ -157,7 +156,7 @@ declare class Ellipsoid {
         array[startingIndex] = value.z;
 
         return array;
-    };
+    }
 
     /**
      * Retrieves an instance from a packed array.
@@ -167,7 +166,7 @@ declare class Ellipsoid {
      * @param {Cartesian3} [result] The object into which to store the result.
      * @returns {Cartesian3} The modified result parameter or a new Cartesian3 instance if one was not provided.
      */
-    static unpack(array: number[], startingIndex: number = 0, result?: Cartesian3): Cartesian3 {
+    static unpack(array: number[], startingIndex = 0, result?: Cartesian3): Cartesian3 {
         //>>includeStart('debug', pragmas.debug);
         Check.defined('array', array);
         //>>includeEnd('debug');
@@ -179,7 +178,7 @@ declare class Ellipsoid {
         result.y = array[startingIndex++];
         result.z = array[startingIndex];
         return result;
-    };
+    }
 
     /**
      * Flattens an array of Cartesian3s into an array of components.
@@ -207,7 +206,7 @@ declare class Ellipsoid {
             Cartesian3.pack(array[i], result, i * 3);
         }
         return result;
-    };
+    }
 
     /**
      * Unpacks an array of cartesian components into an array of Cartesian3s.
@@ -237,7 +236,7 @@ declare class Ellipsoid {
             result[index] = Cartesian3.unpack(array, i, result[index]);
         }
         return result;
-    };
+    }
 
     /**
      * Creates a Cartesian3 from three consecutive elements in an array.
@@ -257,9 +256,9 @@ declare class Ellipsoid {
      * var v2 = [0.0, 0.0, 1.0, 2.0, 3.0];
      * var p2 = Cesium.Cartesian3.fromArray(v2, 2);
      */
-    static fromArray(array: number[], startingIndex: number = 0, result?: Cartesian3): Cartesian3 {
+    static fromArray(array: number[], startingIndex = 0, result?: Cartesian3): Cartesian3 {
         return Cartesian3.unpack(array, startingIndex, result);
-    };
+    }
 
     /**
      * Computes the value of the maximum component for the supplied Cartesian.
@@ -273,7 +272,7 @@ declare class Ellipsoid {
         //>>includeEnd('debug');
 
         return Math.max(cartesian.x, cartesian.y, cartesian.z);
-    };
+    }
 
     /**
      * Computes the value of the minimum component for the supplied Cartesian.
@@ -287,7 +286,7 @@ declare class Ellipsoid {
         //>>includeEnd('debug');
 
         return Math.min(cartesian.x, cartesian.y, cartesian.z);
-    };
+    }
 
     /**
      * Compares two Cartesians and computes a Cartesian which contains the minimum components of the supplied Cartesians.
@@ -309,7 +308,7 @@ declare class Ellipsoid {
         result.z = Math.min(first.z, second.z);
 
         return result;
-    };
+    }
 
     /**
      * Compares two Cartesians and computes a Cartesian which contains the maximum components of the supplied Cartesians.
@@ -330,7 +329,7 @@ declare class Ellipsoid {
         result.y = Math.max(first.y, second.y);
         result.z = Math.max(first.z, second.z);
         return result;
-    };
+    }
 
     /**
      * Computes the provided Cartesian's squared magnitude.
@@ -344,7 +343,7 @@ declare class Ellipsoid {
         //>>includeEnd('debug');
 
         return cartesian.x * cartesian.x + cartesian.y * cartesian.y + cartesian.z * cartesian.z;
-    };
+    }
 
     /**
      * Computes the Cartesian's magnitude (length).
@@ -354,7 +353,7 @@ declare class Ellipsoid {
      */
     static magnitude(cartesian: Cartesian3): number {
         return Math.sqrt(Cartesian3.magnitudeSquared(cartesian));
-    };
+    }
 
     /**
      * Computes the distance between two points.
@@ -375,7 +374,7 @@ declare class Ellipsoid {
 
         Cartesian3.subtract(left, right, distanceScratch);
         return Cartesian3.magnitude(distanceScratch);
-    };
+    }
 
     /**
      * Computes the squared distance between two points.  Comparing squared distances
@@ -397,7 +396,7 @@ declare class Ellipsoid {
 
         Cartesian3.subtract(left, right, distanceScratch);
         return Cartesian3.magnitudeSquared(distanceScratch);
-    };
+    }
 
     /**
      * Computes the normalized form of the supplied Cartesian.
@@ -425,7 +424,7 @@ declare class Ellipsoid {
         //>>includeEnd('debug');
 
         return result;
-    };
+    }
 
     /**
      * Computes the dot (scalar) product of two Cartesians.
@@ -441,7 +440,7 @@ declare class Ellipsoid {
         //>>includeEnd('debug');
 
         return left.x * right.x + left.y * right.y + left.z * right.z;
-    };
+    }
 
     /**
      * Computes the componentwise product of two Cartesians.
@@ -462,7 +461,7 @@ declare class Ellipsoid {
         result.y = left.y * right.y;
         result.z = left.z * right.z;
         return result;
-    };
+    }
 
     /**
      * Computes the componentwise quotient of two Cartesians.
@@ -483,7 +482,7 @@ declare class Ellipsoid {
         result.y = left.y / right.y;
         result.z = left.z / right.z;
         return result;
-    };
+    }
 
     /**
      * Computes the componentwise sum of two Cartesians.
@@ -504,7 +503,7 @@ declare class Ellipsoid {
         result.y = left.y + right.y;
         result.z = left.z + right.z;
         return result;
-    };
+    }
 
     /**
      * Computes the componentwise difference of two Cartesians.
@@ -525,7 +524,7 @@ declare class Ellipsoid {
         result.y = left.y - right.y;
         result.z = left.z - right.z;
         return result;
-    };
+    }
 
     /**
      * Multiplies the provided Cartesian componentwise by the provided scalar.
@@ -546,7 +545,7 @@ declare class Ellipsoid {
         result.y = cartesian.y * scalar;
         result.z = cartesian.z * scalar;
         return result;
-    };
+    }
 
     /**
      * Divides the provided Cartesian componentwise by the provided scalar.
@@ -567,7 +566,7 @@ declare class Ellipsoid {
         result.y = cartesian.y / scalar;
         result.z = cartesian.z / scalar;
         return result;
-    };
+    }
 
     /**
      * Negates the provided Cartesian.
@@ -586,7 +585,7 @@ declare class Ellipsoid {
         result.y = -cartesian.y;
         result.z = -cartesian.z;
         return result;
-    };
+    }
 
     /**
      * Computes the absolute value of the provided Cartesian.
@@ -605,7 +604,7 @@ declare class Ellipsoid {
         result.y = Math.abs(cartesian.y);
         result.z = Math.abs(cartesian.z);
         return result;
-    };
+    }
 
     /**
      * Computes the linear interpolation or extrapolation at t using the provided cartesians.
@@ -627,7 +626,7 @@ declare class Ellipsoid {
         Cartesian3.multiplyByScalar(end, t, lerpScratch);
         result = Cartesian3.multiplyByScalar(start, 1.0 - t, result);
         return Cartesian3.add(lerpScratch, result, result);
-    };
+    }
 
     /**
      * Returns the angle, in radians, between the provided Cartesians.
@@ -647,7 +646,7 @@ declare class Ellipsoid {
         var cosine = Cartesian3.dot(angleBetweenScratch, angleBetweenScratch2);
         var sine = Cartesian3.magnitude(Cartesian3.cross(angleBetweenScratch, angleBetweenScratch2, angleBetweenScratch));
         return Math.atan2(sine, cosine);
-    };
+    }
 
     /**
      * Returns the axis that is most orthogonal to the provided Cartesian.
@@ -678,7 +677,7 @@ declare class Ellipsoid {
         }
 
         return result;
-    };
+    }
 
     /**
      * Projects vector a onto vector b
@@ -696,7 +695,7 @@ declare class Ellipsoid {
 
         var scalar = Cartesian3.dot(a, b) / Cartesian3.dot(b, b);
         return Cartesian3.multiplyByScalar(b, scalar, result);
-    };
+    }
 
     /**
      * Compares the provided Cartesians componentwise and returns
@@ -713,16 +712,16 @@ declare class Ellipsoid {
                (left.x === right.x) &&
                (left.y === right.y) &&
                (left.z === right.z));
-    };
+    }
 
     /**
      * @private
      */
-    static equalsArray(cartesian : Cartesian3, array : number[], offset: number) {
+    static equalsArray(cartesian: Cartesian3, array: number[], offset: number) {
         return cartesian.x === array[offset] &&
                cartesian.y === array[offset + 1] &&
                cartesian.z === array[offset + 2];
-    };
+    }
 
     /**
      * Compares the provided Cartesians componentwise and returns
@@ -742,7 +741,7 @@ declare class Ellipsoid {
                 CesiumMath.equalsEpsilon(left.x, right.x, relativeEpsilon, absoluteEpsilon) &&
                 CesiumMath.equalsEpsilon(left.y, right.y, relativeEpsilon, absoluteEpsilon) &&
                 CesiumMath.equalsEpsilon(left.z, right.z, relativeEpsilon, absoluteEpsilon));
-    };
+    }
 
     /**
      * Computes the cross (outer) product of two Cartesians.
@@ -774,7 +773,7 @@ declare class Ellipsoid {
         result.y = y;
         result.z = z;
         return result;
-    };
+    }
 
     /**
      * Computes the midpoint between the right and left Cartesian.
@@ -795,7 +794,7 @@ declare class Ellipsoid {
         result.z = (left.z + right.z) * 0.5;
 
         return result;
-    };
+    }
 
     /**
      * Returns a Cartesian3 position from longitude and latitude values given in degrees.
@@ -810,7 +809,7 @@ declare class Ellipsoid {
      * @example
      * var position = Cesium.Cartesian3.fromDegrees(-115.0, 37.0);
      */
-    static fromDegrees(longitude: number, latitude: number, height: number = 0, ellipsoid?: Ellipsoid/* = Ellipsoid.WGS84*/, result?: Cartesian3): Cartesian3 {
+    static fromDegrees(longitude: number, latitude: number, height = 0, ellipsoid?: Ellipsoid/* = Ellipsoid.WGS84*/, result?: Cartesian3): Cartesian3 {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.number('longitude', longitude);
         Check.typeOf.number('latitude', latitude);
@@ -819,7 +818,7 @@ declare class Ellipsoid {
         longitude = CesiumMath.toRadians(longitude);
         latitude = CesiumMath.toRadians(latitude);
         return Cartesian3.fromRadians(longitude, latitude, height, ellipsoid, result);
-    };
+    }
 
     /**
      * Returns a Cartesian3 position from longitude and latitude values given in radians.
@@ -834,7 +833,7 @@ declare class Ellipsoid {
      * @example
      * var position = Cesium.Cartesian3.fromRadians(-2.007, 0.645);
      */
-    static fromRadians(longitude: number, latitude: number, height: number = 0, ellipsoid?: Ellipsoid /* = Ellipsoid.WGS84 */, result?: Cartesian3): Cartesian3 {
+    static fromRadians(longitude: number, latitude: number, height = 0, ellipsoid?: Ellipsoid /* = Ellipsoid.WGS84 */, result?: Cartesian3): Cartesian3 {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.number('longitude', longitude);
         Check.typeOf.number('latitude', latitude);
@@ -858,7 +857,7 @@ declare class Ellipsoid {
             result = new Cartesian3();
         }
         return Cartesian3.add(scratchK, scratchN, result);
-    };
+    }
 
     /**
      * Returns an array of Cartesian3 positions given an array of longitude and latitude values given in degrees.
@@ -894,7 +893,7 @@ declare class Ellipsoid {
         }
 
         return result;
-    };
+    }
 
     /**
      * Returns an array of Cartesian3 positions given an array of longitude and latitude values given in radians.
@@ -930,7 +929,7 @@ declare class Ellipsoid {
         }
 
         return result;
-    };
+    }
 
     /**
      * Returns an array of Cartesian3 positions given an array of longitude, latitude and height values where longitude and latitude are given in degrees.
@@ -967,7 +966,7 @@ declare class Ellipsoid {
         }
 
         return result;
-    };
+    }
 
     /**
      * Returns an array of Cartesian3 positions given an array of longitude, latitude and height values where longitude and latitude are given in radians.
@@ -1004,7 +1003,7 @@ declare class Ellipsoid {
         }
 
         return result;
-    };
+    }
 
     /**
      * An immutable Cartesian3 instance initialized to (0.0, 0.0, 0.0).
@@ -1046,7 +1045,7 @@ declare class Ellipsoid {
      */
     clone(result?: Cartesian3): Cartesian3 {
         return Cartesian3.clone(this, result);
-    };
+    }
 
     /**
      * Compares this Cartesian against the provided Cartesian componentwise and returns
@@ -1057,7 +1056,7 @@ declare class Ellipsoid {
      */
     equals(right?: Cartesian3): boolean {
         return Cartesian3.equals(this, right);
-    };
+    }
 
     /**
      * Compares this Cartesian against the provided Cartesian componentwise and returns
@@ -1071,7 +1070,7 @@ declare class Ellipsoid {
      */
     equalsEpsilon(right?: Cartesian3, relativeEpsilon?: number, absoluteEpsilon?: number): boolean {
         return Cartesian3.equalsEpsilon(this, right, relativeEpsilon, absoluteEpsilon);
-    };
+    }
 
     /**
      * Creates a string representing this Cartesian in the format '(x, y, z)'.
@@ -1080,7 +1079,7 @@ declare class Ellipsoid {
      */
     toString(): string {
         return '(' + this.x + ', ' + this.y + ', ' + this.z + ')';
-    };
+    }
     }
 
     var lerpScratch = new Cartesian3();

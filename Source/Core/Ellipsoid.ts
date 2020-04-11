@@ -213,7 +213,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
 
         initialize(result, cartesian.x, cartesian.y, cartesian.z);
         return result;
-    };
+    }
 
     /**
      * An Ellipsoid instance initialized to the WGS84 standard.
@@ -248,7 +248,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      */
     clone(result: Ellipsoid): Ellipsoid {
         return Ellipsoid.clone(this, result);
-    };
+    }
 
     /**
      * The number of elements used to pack the object into an array.
@@ -276,7 +276,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
         Cartesian3.pack(value._radii, array, startingIndex);
 
         return array;
-    };
+    }
 
     /**
      * Retrieves an instance from a packed array.
@@ -295,7 +295,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
 
         var radii = Cartesian3.unpack(array, startingIndex);
         return Ellipsoid.fromCartesian3(radii, result);
-    };
+    }
 
     /**
      * Computes the unit vector directed from the center of this ellipsoid toward the provided Cartesian position.
@@ -336,7 +336,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
         result.y = y;
         result.z = z;
         return Cartesian3.normalize(result, result);
-    };
+    }
 
     /**
      * Computes the normal of the plane tangent to the surface of the ellipsoid at the provided position.
@@ -351,7 +351,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
         }
         result = Cartesian3.multiplyComponents(cartesian, this._oneOverRadiiSquared, result);
         return Cartesian3.normalize(result, result);
-    };
+    }
 
     /**
      * Converts the provided cartographic to Cartesian representation.
@@ -447,7 +447,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
         result.latitude = latitude;
         result.height = height;
         return result;
-    };
+    }
 
     /**
      * Converts the provided array of cartesians to an array of cartographics.
@@ -478,7 +478,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
             result[i] = this.cartesianToCartographic(cartesians[i], result[i]);
         }
         return result;
-    };
+    }
 
     /**
      * Scales the provided Cartesian position along the geodetic surface normal
@@ -491,7 +491,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      */
     scaleToGeodeticSurface(cartesian: Cartesian3, result: Cartesian3): Cartesian3 {
         return scaleToGeodeticSurface(cartesian, this._oneOverRadii, this._oneOverRadiiSquared, this._centerToleranceSquared, result);
-    };
+    }
 
     /**
      * Scales the provided Cartesian position along the geocentric surface normal
@@ -520,7 +520,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
                                    (positionZ * positionZ) * oneOverRadiiSquared.z);
 
         return Cartesian3.multiplyByScalar(cartesian, beta, result);
-    };
+    }
 
     /**
      * Transforms a Cartesian X, Y, Z position to the ellipsoid-scaled space by multiplying
@@ -538,7 +538,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
         }
 
         return Cartesian3.multiplyComponents(position, this._oneOverRadii, result);
-    };
+    }
 
     /**
      * Transforms a Cartesian X, Y, Z position from the ellipsoid-scaled space by multiplying
@@ -556,7 +556,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
         }
 
         return Cartesian3.multiplyComponents(position, this._radii, result);
-    };
+    }
 
     /**
      * Compares this Ellipsoid against the provided Ellipsoid componentwise and returns
@@ -569,7 +569,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
         return (this === right) ||
                (defined(right) &&
                 Cartesian3.equals(this._radii, right._radii));
-    };
+    }
 
     /**
      * Creates a string representing this Ellipsoid in the format '(radii.x, radii.y, radii.z)'.
@@ -578,7 +578,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      */
     toString(): string {
         return this._radii.toString();
-    };
+    }
 
     /**
      * Computes a point which is the intersection of the surface normal with the z-axis.
@@ -624,7 +624,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
         }
 
         return result;
-    };
+    }
     }
 
     var cartographicToCartesianNormal = new Cartesian3();
