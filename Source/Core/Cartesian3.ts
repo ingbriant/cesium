@@ -5,12 +5,13 @@ import DeveloperError from './DeveloperError.js';
 import CesiumMath from './Math.js';
 import Spherical from './Spherical.js';
 
-//Temporary code to avoid circular dependencies until the two below files are converted to TS
+// Temporary code to avoid circular dependencies until we fix it the right away
+// Once fixed we can also change occurrenced of "ellipsoid?: Ellipsoid/* = Ellipsoid.WGS84*/"
+// to "ellipsoid: Ellipsoid = Ellipsoid.WGS84
 // import Ellipsoid from './Ellipsoid.js';
 declare class Ellipsoid {
     radiiSquared: Cartesian3;
-    static WGS84: Ellipsoid
-};
+}
 
     /**
      * A 3D Cartesian point.
@@ -48,15 +49,6 @@ declare class Ellipsoid {
             this.y = y;
             this.z = z;
         }
-
-        static lerpScratch = new Cartesian3();
-        static angleBetweenScratch = new Cartesian3();
-        static angleBetweenScratch2 = new Cartesian3();
-        static mostOrthogonalAxisScratch = new Cartesian3();
-        static scratchN = new Cartesian3();
-        static scratchK = new Cartesian3();
-        static wgs84RadiiSquared = new Cartesian3(6378137.0 * 6378137.0, 6378137.0 * 6378137.0, 6356752.3142451793 * 6356752.3142451793);
-        static distanceScratch = new Cartesian3();
 
     /**
      * Converts the provided Spherical into Cartesian3 coordinates.
@@ -376,8 +368,8 @@ declare class Ellipsoid {
         Check.typeOf.object('right', right);
         //>>includeEnd('debug');
 
-        Cartesian3.subtract(left, right, Cartesian3.distanceScratch);
-        return Cartesian3.magnitude(Cartesian3.distanceScratch);
+        Cartesian3.subtract(left, right, distanceScratch);
+        return Cartesian3.magnitude(distanceScratch);
     };
 
     /**
@@ -398,8 +390,8 @@ declare class Ellipsoid {
         Check.typeOf.object('right', right);
         //>>includeEnd('debug');
 
-        Cartesian3.subtract(left, right, Cartesian3.distanceScratch);
-        return Cartesian3.magnitudeSquared(Cartesian3.distanceScratch);
+        Cartesian3.subtract(left, right, distanceScratch);
+        return Cartesian3.magnitudeSquared(distanceScratch);
     };
 
     /**
@@ -627,9 +619,9 @@ declare class Ellipsoid {
         Check.typeOf.object('result', result);
         //>>includeEnd('debug');
 
-        Cartesian3.multiplyByScalar(end, t, Cartesian3.lerpScratch);
+        Cartesian3.multiplyByScalar(end, t, lerpScratch);
         result = Cartesian3.multiplyByScalar(start, 1.0 - t, result);
-        return Cartesian3.add(Cartesian3.lerpScratch, result, result);
+        return Cartesian3.add(lerpScratch, result, result);
     };
 
     /**
@@ -645,10 +637,10 @@ declare class Ellipsoid {
         Check.typeOf.object('right', right);
         //>>includeEnd('debug');
 
-        Cartesian3.normalize(left, Cartesian3.angleBetweenScratch);
-        Cartesian3.normalize(right, Cartesian3.angleBetweenScratch2);
-        var cosine = Cartesian3.dot(Cartesian3.angleBetweenScratch, Cartesian3.angleBetweenScratch2);
-        var sine = Cartesian3.magnitude(Cartesian3.cross(Cartesian3.angleBetweenScratch, Cartesian3.angleBetweenScratch2, Cartesian3.angleBetweenScratch));
+        Cartesian3.normalize(left, angleBetweenScratch);
+        Cartesian3.normalize(right, angleBetweenScratch2);
+        var cosine = Cartesian3.dot(angleBetweenScratch, angleBetweenScratch2);
+        var sine = Cartesian3.magnitude(Cartesian3.cross(angleBetweenScratch, angleBetweenScratch2, angleBetweenScratch));
         return Math.atan2(sine, cosine);
     };
 
@@ -665,7 +657,7 @@ declare class Ellipsoid {
         Check.typeOf.object('result', result);
         //>>includeEnd('debug');
 
-        var f = Cartesian3.normalize(cartesian, Cartesian3.mostOrthogonalAxisScratch);
+        var f = Cartesian3.normalize(cartesian, mostOrthogonalAxisScratch);
         Cartesian3.abs(f, f);
 
         if (f.x <= f.y) {
@@ -813,7 +805,7 @@ declare class Ellipsoid {
      * @example
      * var position = Cesium.Cartesian3.fromDegrees(-115.0, 37.0);
      */
-    static fromDegrees(longitude: number, latitude: number, height: number = 0, ellipsoid: Ellipsoid = Ellipsoid.WGS84, result?: Cartesian3): Cartesian3 {
+    static fromDegrees(longitude: number, latitude: number, height: number = 0, ellipsoid?: Ellipsoid/* = Ellipsoid.WGS84*/, result?: Cartesian3): Cartesian3 {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.number('longitude', longitude);
         Check.typeOf.number('latitude', latitude);
@@ -837,30 +829,30 @@ declare class Ellipsoid {
      * @example
      * var position = Cesium.Cartesian3.fromRadians(-2.007, 0.645);
      */
-    static fromRadians(longitude: number, latitude: number, height: number = 0, ellipsoid: Ellipsoid = Ellipsoid.WGS84, result?: Cartesian3): Cartesian3 {
+    static fromRadians(longitude: number, latitude: number, height: number = 0, ellipsoid?: Ellipsoid /* = Ellipsoid.WGS84 */, result?: Cartesian3): Cartesian3 {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.number('longitude', longitude);
         Check.typeOf.number('latitude', latitude);
         //>>includeEnd('debug');
 
         height = defaultValue(height, 0.0);
-        var radiiSquared = defined(ellipsoid) ? ellipsoid.radiiSquared : Cartesian3.wgs84RadiiSquared;
+        var radiiSquared = defined(ellipsoid) ? ellipsoid.radiiSquared : wgs84RadiiSquared;
 
         var cosLatitude = Math.cos(latitude);
-        Cartesian3.scratchN.x = cosLatitude * Math.cos(longitude);
-        Cartesian3.scratchN.y = cosLatitude * Math.sin(longitude);
-        Cartesian3.scratchN.z = Math.sin(latitude);
-        Cartesian3.scratchN = Cartesian3.normalize(Cartesian3.scratchN, Cartesian3.scratchN);
+        scratchN.x = cosLatitude * Math.cos(longitude);
+        scratchN.y = cosLatitude * Math.sin(longitude);
+        scratchN.z = Math.sin(latitude);
+        scratchN = Cartesian3.normalize(scratchN, scratchN);
 
-        Cartesian3.multiplyComponents(radiiSquared, Cartesian3.scratchN, Cartesian3.scratchK);
-        var gamma = Math.sqrt(Cartesian3.dot(Cartesian3.scratchN, Cartesian3.scratchK));
-        Cartesian3.scratchK = Cartesian3.divideByScalar(Cartesian3.scratchK, gamma, Cartesian3.scratchK);
-        Cartesian3.scratchN = Cartesian3.multiplyByScalar(Cartesian3.scratchN, height, Cartesian3.scratchN);
+        Cartesian3.multiplyComponents(radiiSquared, scratchN, scratchK);
+        var gamma = Math.sqrt(Cartesian3.dot(scratchN, scratchK));
+        scratchK = Cartesian3.divideByScalar(scratchK, gamma, scratchK);
+        scratchN = Cartesian3.multiplyByScalar(scratchN, height, scratchN);
 
         if (!defined(result)) {
             result = new Cartesian3();
         }
-        return Cartesian3.add(Cartesian3.scratchK, Cartesian3.scratchN, result);
+        return Cartesian3.add(scratchK, scratchN, result);
     };
 
     /**
@@ -874,7 +866,7 @@ declare class Ellipsoid {
      * @example
      * var positions = Cesium.Cartesian3.fromDegreesArray([-115.0, 37.0, -107.0, 33.0]);
      */
-    static fromDegreesArray(coordinates: number[], ellipsoid: Ellipsoid = Ellipsoid.WGS84, result?: Cartesian3[]): Cartesian3[] {
+    static fromDegreesArray(coordinates: number[], ellipsoid?: Ellipsoid /* = Ellipsoid.WGS84 */, result?: Cartesian3[]): Cartesian3[] {
         //>>includeStart('debug', pragmas.debug);
         Check.defined('coordinates', coordinates);
         if (coordinates.length < 2 || coordinates.length % 2 !== 0) {
@@ -910,7 +902,7 @@ declare class Ellipsoid {
      * @example
      * var positions = Cesium.Cartesian3.fromRadiansArray([-2.007, 0.645, -1.867, .575]);
      */
-    static fromRadiansArray(coordinates: number[], ellipsoid: Ellipsoid = Ellipsoid.WGS84, result?: Cartesian3[]): Cartesian3[] {
+    static fromRadiansArray(coordinates: number[], ellipsoid?: Ellipsoid /* = Ellipsoid.WGS84 */, result?: Cartesian3[]): Cartesian3[] {
         //>>includeStart('debug', pragmas.debug);
         Check.defined('coordinates', coordinates);
         if (coordinates.length < 2 || coordinates.length % 2 !== 0) {
@@ -946,7 +938,7 @@ declare class Ellipsoid {
      * @example
      * var positions = Cesium.Cartesian3.fromDegreesArrayHeights([-115.0, 37.0, 100000.0, -107.0, 33.0, 150000.0]);
      */
-    static fromDegreesArrayHeights(coordinates: number[], ellipsoid: Ellipsoid = Ellipsoid.WGS84, result?: Cartesian3[]): Cartesian3[] {
+    static fromDegreesArrayHeights(coordinates: number[], ellipsoid?: Ellipsoid /* = Ellipsoid.WGS84 */, result?: Cartesian3[]): Cartesian3[] {
         //>>includeStart('debug', pragmas.debug);
         Check.defined('coordinates', coordinates);
         if (coordinates.length < 3 || coordinates.length % 3 !== 0) {
@@ -983,7 +975,7 @@ declare class Ellipsoid {
      * @example
      * var positions = Cesium.Cartesian3.fromRadiansArrayHeights([-2.007, 0.645, 100000.0, -1.867, .575, 150000.0]);
      */
-    static fromRadiansArrayHeights(coordinates: number[], ellipsoid: Ellipsoid = Ellipsoid.WGS84, result?: Cartesian3[]): Cartesian3[] {
+    static fromRadiansArrayHeights(coordinates: number[], ellipsoid?: Ellipsoid /* = Ellipsoid.WGS84 */, result?: Cartesian3[]): Cartesian3[] {
         //>>includeStart('debug', pragmas.debug);
         Check.defined('coordinates', coordinates);
         if (coordinates.length < 3 || coordinates.length % 3 !== 0) {
@@ -1085,5 +1077,14 @@ declare class Ellipsoid {
         return '(' + this.x + ', ' + this.y + ', ' + this.z + ')';
     };
     }
+
+    var lerpScratch = new Cartesian3();
+    var angleBetweenScratch = new Cartesian3();
+    var angleBetweenScratch2 = new Cartesian3();
+    var mostOrthogonalAxisScratch = new Cartesian3();
+    var scratchN = new Cartesian3();
+    var scratchK = new Cartesian3();
+    var wgs84RadiiSquared = new Cartesian3(6378137.0 * 6378137.0, 6378137.0 * 6378137.0, 6356752.3142451793 * 6356752.3142451793);
+    var distanceScratch = new Cartesian3();
 
     export default Cartesian3;

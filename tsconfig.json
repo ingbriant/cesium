@@ -1,5 +1,4 @@
 {
-    "allowJS": true,
-    "module": "es6",
-    "target": "es3"
+    "module": "ES6",
+    "target": "ES5"
 }

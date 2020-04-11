@@ -55,6 +55,23 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      * Rather than constructing this object directly, one of the provided
      * constants is normally used.
      * @alias Ellipsoid
+     *
+     * @see Ellipsoid.fromCartesian3
+     * @see Ellipsoid.WGS84
+     * @see Ellipsoid.UNIT_SPHERE
+     */
+    class Ellipsoid {
+        _radii: Cartesian3;
+        _radiiSquared: Cartesian3;
+        _radiiToTheFourth: Cartesian3;
+        _oneOverRadii: Cartesian3;
+        _oneOverRadiiSquared: Cartesian3;
+        _minimumRadius: number;
+        _maximumRadius: number;
+        _centerToleranceSquared: number;
+        _squaredXOverSquaredZ: number;
+
+    /**
      * @constructor
      *
      * @param {Number} [x=0] The radius in the x direction.
@@ -62,12 +79,8 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      * @param {Number} [z=0] The radius in the z direction.
      *
      * @exception {DeveloperError} All radii components must be greater than or equal to zero.
-     *
-     * @see Ellipsoid.fromCartesian3
-     * @see Ellipsoid.WGS84
-     * @see Ellipsoid.UNIT_SPHERE
      */
-    function Ellipsoid(x, y, z) {
+    constructor(x?: number, y?: number, z?: number) {
         this._radii = undefined;
         this._radiiSquared = undefined;
         this._radiiToTheFourth = undefined;
@@ -81,85 +94,70 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
         initialize(this, x, y, z);
     }
 
-    Object.defineProperties(Ellipsoid.prototype, {
-        /**
-         * Gets the radii of the ellipsoid.
-         * @memberof Ellipsoid.prototype
-         * @type {Cartesian3}
-         * @readonly
-         */
-        radii : {
-            get: function() {
-                return this._radii;
-            }
-        },
-        /**
-         * Gets the squared radii of the ellipsoid.
-         * @memberof Ellipsoid.prototype
-         * @type {Cartesian3}
-         * @readonly
-         */
-        radiiSquared : {
-            get : function() {
-                return this._radiiSquared;
-            }
-        },
-        /**
-         * Gets the radii of the ellipsoid raise to the fourth power.
-         * @memberof Ellipsoid.prototype
-         * @type {Cartesian3}
-         * @readonly
-         */
-        radiiToTheFourth : {
-            get : function() {
-                return this._radiiToTheFourth;
-            }
-        },
-        /**
-         * Gets one over the radii of the ellipsoid.
-         * @memberof Ellipsoid.prototype
-         * @type {Cartesian3}
-         * @readonly
-         */
-        oneOverRadii : {
-            get : function() {
-                return this._oneOverRadii;
-            }
-        },
-        /**
-         * Gets one over the squared radii of the ellipsoid.
-         * @memberof Ellipsoid.prototype
-         * @type {Cartesian3}
-         * @readonly
-         */
-        oneOverRadiiSquared : {
-            get : function() {
-                return this._oneOverRadiiSquared;
-            }
-        },
-        /**
-         * Gets the minimum radius of the ellipsoid.
-         * @memberof Ellipsoid.prototype
-         * @type {Number}
-         * @readonly
-         */
-        minimumRadius : {
-            get : function() {
-                return this._minimumRadius;
-            }
-        },
-        /**
-         * Gets the maximum radius of the ellipsoid.
-         * @memberof Ellipsoid.prototype
-         * @type {Number}
-         * @readonly
-         */
-        maximumRadius : {
-            get : function() {
-                return this._maximumRadius;
-            }
-        }
-    });
+    /**
+     * Gets the radii of the ellipsoid.
+     * @memberof Ellipsoid.prototype
+     * @type {Cartesian3}
+     * @readonly
+     */
+    get radii() {
+        return this._radii;
+    }
+
+    /**
+     * Gets the squared radii of the ellipsoid.
+     * @memberof Ellipsoid.prototype
+     * @type {Cartesian3}
+     * @readonly
+     */
+    get radiiSquared() {
+        return this._radiiSquared;
+    }
+    /**
+     * Gets the radii of the ellipsoid raise to the fourth power.
+     * @memberof Ellipsoid.prototype
+     * @type {Cartesian3}
+     * @readonly
+     */
+    get radiiToTheFourth() {
+        return this._radiiToTheFourth;
+    }
+    /**
+     * Gets one over the radii of the ellipsoid.
+     * @memberof Ellipsoid.prototype
+     * @type {Cartesian3}
+     * @readonly
+     */
+    get oneOverRadii() {
+        return this._oneOverRadii;
+    }
+    /**
+     * Gets one over the squared radii of the ellipsoid.
+     * @memberof Ellipsoid.prototype
+     * @type {Cartesian3}
+     * @readonly
+     */
+    get oneOverRadiiSquared() {
+        return this._oneOverRadiiSquared;
+    }
+    /**
+     * Gets the minimum radius of the ellipsoid.
+     * @memberof Ellipsoid.prototype
+     * @type {Number}
+     * @readonly
+     */
+    get minimumRadius() {
+        return this._minimumRadius;
+    }
+    /**
+     * Gets the maximum radius of the ellipsoid.
+     * @memberof Ellipsoid.prototype
+     * @type {Number}
+     * @readonly
+     */
+    get maximumRadius() {
+        return this._maximumRadius;
+    }
 
     /**
      * Duplicates an Ellipsoid instance.
@@ -169,7 +167,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      *                    instance should be created.
      * @returns {Ellipsoid} The cloned Ellipsoid. (Returns undefined if ellipsoid is undefined)
      */
-    Ellipsoid.clone = function(ellipsoid, result) {
+    static clone(ellipsoid: Ellipsoid, result: Ellipsoid): Ellipsoid {
         if (!defined(ellipsoid)) {
             return undefined;
         }
@@ -189,7 +187,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
         result._centerToleranceSquared = ellipsoid._centerToleranceSquared;
 
         return result;
-    };
+    }
 
     /**
      * Computes an Ellipsoid from a Cartesian specifying the radii in x, y, and z directions.
@@ -204,7 +202,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      * @see Ellipsoid.WGS84
      * @see Ellipsoid.UNIT_SPHERE
      */
-    Ellipsoid.fromCartesian3 = function(cartesian, result) {
+    static fromCartesian3(cartesian: Cartesian3, result: Ellipsoid): Ellipsoid {
         if (!defined(result)) {
             result = new Ellipsoid();
         }
@@ -223,7 +221,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      * @type {Ellipsoid}
      * @constant
      */
-    Ellipsoid.WGS84 = Object.freeze(new Ellipsoid(6378137.0, 6378137.0, 6356752.3142451793));
+    static WGS84: Ellipsoid = Object.freeze(new Ellipsoid(6378137.0, 6378137.0, 6356752.3142451793));
 
     /**
      * An Ellipsoid instance initialized to radii of (1.0, 1.0, 1.0).
@@ -231,7 +229,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      * @type {Ellipsoid}
      * @constant
      */
-    Ellipsoid.UNIT_SPHERE = Object.freeze(new Ellipsoid(1.0, 1.0, 1.0));
+    static UNIT_SPHERE: Ellipsoid = Object.freeze(new Ellipsoid(1.0, 1.0, 1.0));
 
     /**
      * An Ellipsoid instance initialized to a sphere with the lunar radius.
@@ -239,7 +237,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      * @type {Ellipsoid}
      * @constant
      */
-    Ellipsoid.MOON = Object.freeze(new Ellipsoid(CesiumMath.LUNAR_RADIUS, CesiumMath.LUNAR_RADIUS, CesiumMath.LUNAR_RADIUS));
+    static MOON: Ellipsoid = Object.freeze(new Ellipsoid(CesiumMath.LUNAR_RADIUS, CesiumMath.LUNAR_RADIUS, CesiumMath.LUNAR_RADIUS));
 
     /**
      * Duplicates an Ellipsoid instance.
@@ -248,7 +246,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      *                    instance should be created.
      * @returns {Ellipsoid} The cloned Ellipsoid.
      */
-    Ellipsoid.prototype.clone = function(result) {
+    clone(result: Ellipsoid): Ellipsoid {
         return Ellipsoid.clone(this, result);
     };
 
@@ -256,7 +254,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      * The number of elements used to pack the object into an array.
      * @type {Number}
      */
-    Ellipsoid.packedLength = Cartesian3.packedLength;
+    static packedLength: number = Cartesian3.packedLength;
 
     /**
      * Stores the provided instance into the provided array.
@@ -267,7 +265,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      *
      * @returns {Number[]} The array that was packed into
      */
-    Ellipsoid.pack = function(value, array, startingIndex) {
+    static pack(value: Ellipsoid, array: number[], startingIndex: number): number[] {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('value', value);
         Check.defined('array', array);
@@ -288,7 +286,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      * @param {Ellipsoid} [result] The object into which to store the result.
      * @returns {Ellipsoid} The modified result parameter or a new Ellipsoid instance if one was not provided.
      */
-    Ellipsoid.unpack = function(array, startingIndex, result) {
+    static unpack(array: number[], startingIndex: number, result: Ellipsoid): Ellipsoid {
         //>>includeStart('debug', pragmas.debug);
         Check.defined('array', array);
         //>>includeEnd('debug');
@@ -307,7 +305,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      * @param {Cartesian3} [result] The object onto which to store the result.
      * @returns {Cartesian3} The modified result parameter or a new Cartesian3 instance if none was provided.
      */
-    Ellipsoid.prototype.geocentricSurfaceNormal = Cartesian3.normalize;
+    geocentricSurfaceNormal = Cartesian3.normalize;
 
     /**
      * Computes the normal of the plane tangent to the surface of the ellipsoid at the provided position.
@@ -316,7 +314,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      * @param {Cartesian3} [result] The object onto which to store the result.
      * @returns {Cartesian3} The modified result parameter or a new Cartesian3 instance if none was provided.
      */
-    Ellipsoid.prototype.geodeticSurfaceNormalCartographic = function(cartographic, result) {
+    geodeticSurfaceNormalCartographic(cartographic: Cartographic, result: Cartesian3): Cartesian3 {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('cartographic', cartographic);
         //>>includeEnd('debug');
@@ -345,16 +343,13 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      * @param {Cartesian3} [result] The object onto which to store the result.
      * @returns {Cartesian3} The modified result parameter or a new Cartesian3 instance if none was provided.
      */
-    Ellipsoid.prototype.geodeticSurfaceNormal = function(cartesian, result) {
+    geodeticSurfaceNormal(cartesian: Cartesian3, result: Cartesian3): Cartesian3 {
         if (!defined(result)) {
             result = new Cartesian3();
         }
         result = Cartesian3.multiplyComponents(cartesian, this._oneOverRadiiSquared, result);
         return Cartesian3.normalize(result, result);
     };
-
-    var cartographicToCartesianNormal = new Cartesian3();
-    var cartographicToCartesianK = new Cartesian3();
 
     /**
      * Converts the provided cartographic to Cartesian representation.
@@ -368,7 +363,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      * var position = new Cesium.Cartographic(Cesium.Math.toRadians(21), Cesium.Math.toRadians(78), 5000);
      * var cartesianPosition = Cesium.Ellipsoid.WGS84.cartographicToCartesian(position);
      */
-    Ellipsoid.prototype.cartographicToCartesian = function(cartographic, result) {
+    cartographicToCartesian(cartographic: Cartographic, result: Cartesian3): Cartesian3 {
         //`cartographic is required` is thrown from geodeticSurfaceNormalCartographic.
         var n = cartographicToCartesianNormal;
         var k = cartographicToCartesianK;
@@ -382,7 +377,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
             result = new Cartesian3();
         }
         return Cartesian3.add(k, n, result);
-    };
+    }
 
     /**
      * Converts the provided array of cartographics to an array of Cartesians.
@@ -398,7 +393,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      *                  new Cesium.Cartographic(Cesium.Math.toRadians(21.645), Cesium.Math.toRadians(78.456), 250)];
      * var cartesianPositions = Cesium.Ellipsoid.WGS84.cartographicArrayToCartesianArray(positions);
      */
-    Ellipsoid.prototype.cartographicArrayToCartesianArray = function(cartographics, result) {
+    cartographicArrayToCartesianArray(cartographics: Cartographic[], result: Cartesian3[]): Cartesian3[] {
         //>>includeStart('debug', pragmas.debug);
         Check.defined('cartographics', cartographics);
         //>>includeEnd('debug')
@@ -413,11 +408,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
             result[i] = this.cartographicToCartesian(cartographics[i], result[i]);
         }
         return result;
-    };
-
-    var cartesianToCartographicN = new Cartesian3();
-    var cartesianToCartographicP = new Cartesian3();
-    var cartesianToCartographicH = new Cartesian3();
+    }
 
     /**
      * Converts the provided cartesian to cartographic representation.
@@ -432,7 +423,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      * var position = new Cesium.Cartesian3(17832.12, 83234.52, 952313.73);
      * var cartographicPosition = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
      */
-    Ellipsoid.prototype.cartesianToCartographic = function(cartesian, result) {
+    cartesianToCartographic(cartesian: Cartesian3, result: Cartographic): Cartographic {
         //`cartesian is required.` is thrown from scaleToGeodeticSurface
         var p = this.scaleToGeodeticSurface(cartesian, cartesianToCartographicP);
 
@@ -470,7 +461,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      *                  new Cesium.Cartesian3(17832.14, 83234.54, 952313.73)]
      * var cartographicPositions = Cesium.Ellipsoid.WGS84.cartesianArrayToCartographicArray(positions);
      */
-    Ellipsoid.prototype.cartesianArrayToCartographicArray = function(cartesians, result) {
+    cartesianArrayToCartographicArray(cartesians: Cartesian3[], result: Cartographic[]): Cartographic[] {
         //>>includeStart('debug', pragmas.debug);
         Check.defined('cartesians', cartesians);
         //>>includeEnd('debug');
@@ -496,7 +487,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      * @param {Cartesian3} [result] The object onto which to store the result.
      * @returns {Cartesian3} The modified result parameter, a new Cartesian3 instance if none was provided, or undefined if the position is at the center.
      */
-    Ellipsoid.prototype.scaleToGeodeticSurface = function(cartesian, result) {
+    scaleToGeodeticSurface(cartesian: Cartesian3, result: Cartesian3): Cartesian3 {
         return scaleToGeodeticSurface(cartesian, this._oneOverRadii, this._oneOverRadiiSquared, this._centerToleranceSquared, result);
     };
 
@@ -508,7 +499,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      * @param {Cartesian3} [result] The object onto which to store the result.
      * @returns {Cartesian3} The modified result parameter or a new Cartesian3 instance if none was provided.
      */
-    Ellipsoid.prototype.scaleToGeocentricSurface = function(cartesian, result) {
+    scaleToGeocentricSurface(cartesian: Cartesian3, result: Cartesian3): Cartesian3 {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('cartesian', cartesian);
         //>>includeEnd('debug');
@@ -539,7 +530,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      * @returns {Cartesian3} The position expressed in the scaled space.  The returned instance is the
      *          one passed as the result parameter if it is not undefined, or a new instance of it is.
      */
-    Ellipsoid.prototype.transformPositionToScaledSpace = function(position, result) {
+    transformPositionToScaledSpace(position: Cartesian3, result: Cartesian3): Cartesian3 {
         if (!defined(result)) {
             result = new Cartesian3();
         }
@@ -557,7 +548,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      * @returns {Cartesian3} The position expressed in the unscaled space.  The returned instance is the
      *          one passed as the result parameter if it is not undefined, or a new instance of it is.
      */
-    Ellipsoid.prototype.transformPositionFromScaledSpace = function(position, result) {
+    transformPositionFromScaledSpace(position: Cartesian3, result: Cartesian3): Cartesian3 {
         if (!defined(result)) {
             result = new Cartesian3();
         }
@@ -572,7 +563,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      * @param {Ellipsoid} [right] The other Ellipsoid.
      * @returns {Boolean} <code>true</code> if they are equal, <code>false</code> otherwise.
      */
-    Ellipsoid.prototype.equals = function(right) {
+    equals(right: Ellipsoid): boolean {
         return (this === right) ||
                (defined(right) &&
                 Cartesian3.equals(this._radii, right._radii));
@@ -583,7 +574,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      *
      * @returns {String} A string representing this ellipsoid in the format '(radii.x, radii.y, radii.z)'.
      */
-    Ellipsoid.prototype.toString = function() {
+    toString(): string {
         return this._radii.toString();
     };
 
@@ -603,7 +594,7 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      * @exception {DeveloperError} Ellipsoid must be an ellipsoid of revolution (radii.x == radii.y).
      * @exception {DeveloperError} Ellipsoid.radii.z must be greater than 0.
      */
-    Ellipsoid.prototype.getSurfaceNormalIntersectionWithZAxis = function(position, buffer, result) {
+    getSurfaceNormalIntersectionWithZAxis(position: Cartesian3, buffer: number, result: Cartesian3): Cartesian3 | undefined {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('position', position);
 
@@ -632,4 +623,12 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
 
         return result;
     };
+    }
+
+    var cartographicToCartesianNormal = new Cartesian3();
+    var cartographicToCartesianK = new Cartesian3();
+    var cartesianToCartographicN = new Cartesian3();
+    var cartesianToCartographicP = new Cartesian3();
+    var cartesianToCartographicH = new Cartesian3();
+
 export default Ellipsoid;
