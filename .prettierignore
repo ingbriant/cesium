@@ -1,0 +1,14 @@
+# Ignore everything by default
+*
+
+# Add the code we care about
+!Apps/**/
+!Apps/**/*.js
+Apps/Sandcastle/ThirdParty/**
+
+!Source/**/
+!Source/**/*.js
+Source/ThirdParty/**
+
+!Specs/**/
+!Specs/**/*.js
