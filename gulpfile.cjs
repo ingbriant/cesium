@@ -83,11 +83,11 @@ var watchedFiles = ['Source/**/*.js',
                     '!Specs/SpecList.js'];
 
 var filesToClean = ['Source/Cesium.ts',
-                    'Source/Shaders/**/*.js',
+                    'Source/Shaders/**/*.ts',
                     'Source/Workers/**',
                     '!Source/Workers/cesiumWorkerBootstrapper.js',
                     '!Source/Workers/transferTypedArrayTest.js',
-                    'Source/ThirdParty/Shaders/*.js',
+                    'Source/ThirdParty/Shaders/*.ts',
                     'Specs/SpecList.js',
                     'Apps/Sandcastle/jsHintOptions.js',
                     'Apps/Sandcastle/gallery/gallery-index.js',
@@ -988,7 +988,7 @@ function glslToJavaScript(minify, minifyStateFilePath) {
 // we still are using from the set, then delete any files remaining in the set.
     var leftOverJsFiles = {};
 
-    globby.sync(['Source/Shaders/**/*.js', 'Source/ThirdParty/Shaders/*.js']).forEach(function(file) {
+    globby.sync(['Source/Shaders/**/*.ts', 'Source/ThirdParty/Shaders/*.ts']).forEach(function(file) {
         leftOverJsFiles[path.normalize(file)] = true;
     });
 
@@ -1000,7 +1000,7 @@ function glslToJavaScript(minify, minifyStateFilePath) {
     glslFiles.forEach(function(glslFile) {
         glslFile = path.normalize(glslFile);
         var baseName = path.basename(glslFile, '.glsl');
-        var jsFile = path.join(path.dirname(glslFile), baseName) + '.js';
+        var jsFile = path.join(path.dirname(glslFile), baseName) + '.ts';
 
         // identify built in functions, structs, and constants
         var baseDir = path.join('Source', 'Shaders', 'Builtin');
@@ -1073,7 +1073,7 @@ export default "' + contents + '";\n';
         contents.imports.join('\n') +
         '\n\nexport default {\n    ' + contents.builtinLookup.join(',\n    ') + '\n};\n';
 
-    fs.writeFileSync(path.join('Source', 'Shaders', 'Builtin', 'CzmBuiltins.js'), fileContents);
+    fs.writeFileSync(path.join('Source', 'Shaders', 'Builtin', 'CzmBuiltins.ts'), fileContents);
 }
 
 function createCesiumJs() {

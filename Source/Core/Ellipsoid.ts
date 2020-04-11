@@ -305,7 +305,9 @@ import scaleToGeodeticSurface from './scaleToGeodeticSurface.js';
      * @param {Cartesian3} [result] The object onto which to store the result.
      * @returns {Cartesian3} The modified result parameter or a new Cartesian3 instance if none was provided.
      */
-    geocentricSurfaceNormal = Cartesian3.normalize;
+    geocentricSurfaceNormal(cartesian: Cartesian3, result: Cartesian3): Cartesian3 {
+        return Cartesian3.normalize(cartesian, result);
+    }
 
     /**
      * Computes the normal of the plane tangent to the surface of the ellipsoid at the provided position.

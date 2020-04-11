@@ -7,37 +7,39 @@ import Cartesian3 from './Cartesian3';
      * A set of curvilinear 3-dimensional coordinates.
      *
      * @alias Spherical
-     * @constructor
-     *
-     * @param {Number} [clock=0.0] The angular coordinate lying in the xy-plane measured from the positive x-axis and toward the positive y-axis.
-     * @param {Number} [cone=0.0] The angular coordinate measured from the positive z-axis and toward the negative z-axis.
-     * @param {Number} [magnitude=1.0] The linear coordinate measured from the origin.
      */
     class Spherical {
-        clock: number;
-        cone: number;
-        magnitude: number;
+        /**
+         * The clock component.
+         * @type {Number} clock
+         * @default 0.0
+         * @memberof Spherical.prototype
+         */
 
-        constructor(clock: number = 0, cone: number = 0, magnitude: number = 0) {
-            /**
-             * The clock component.
-             * @type {Number}
-             * @default 0.0
-             */
-            this.clock = clock;
-            /**
-             * The cone component.
-             * @type {Number}
-             * @default 0.0
-             */
-            this.cone = cone;
-            /**
-             * The magnitude component.
-             * @type {Number}
-             * @default 1.0
-             */
-            this.magnitude = magnitude;
+         /**
+         * The cone component.
+         * @type {Number} cone
+         * @default 0.0
+         * @memberof Spherical.prototype
+         */
+
+         /**
+         * The magnitude component.
+         * @type {Number} magnitude
+         * @default 1.0
+         * @memberof Spherical.prototype
+         */
+
+        /**
+         * @constructor
+         *
+         * @param {Number} [clock=0.0] The angular coordinate lying in the xy-plane measured from the positive x-axis and toward the positive y-axis.
+         * @param {Number} [cone=0.0] The angular coordinate measured from the positive z-axis and toward the negative z-axis.
+         * @param {Number} [magnitude=1.0] The linear coordinate measured from the origin.
+        */
+        constructor(public clock: number = 0.0, public cone: number = 0.0, public magnitude: number = 1.0) {
         }
+
         /**
          * Returns true if this spherical is equal to the provided spherical, false otherwise.
          *

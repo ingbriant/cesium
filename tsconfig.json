@@ -1,4 +1,6 @@
 {
-    "module": "ES6",
-    "target": "ES5"
+    "compilerOptions": {
+        "module": "ES6",
+        "target": "ES5"
+    }
 }

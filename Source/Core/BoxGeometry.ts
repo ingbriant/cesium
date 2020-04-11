@@ -1,68 +1,79 @@
-import arrayFill from './arrayFill.js';
-import BoundingSphere from './BoundingSphere.js';
-import Cartesian3 from './Cartesian3.js';
-import Check from './Check.js';
-import ComponentDatatype from './ComponentDatatype.js';
-import defaultValue from './defaultValue.js';
-import defined from './defined.js';
-import DeveloperError from './DeveloperError.js';
-import Geometry from './Geometry.js';
-import GeometryAttribute from './GeometryAttribute.js';
-import GeometryAttributes from './GeometryAttributes.js';
-import GeometryOffsetAttribute from './GeometryOffsetAttribute.js';
-import PrimitiveType from './PrimitiveType.js';
-import VertexFormat from './VertexFormat.js';
+import arrayFill from "./arrayFill.js";
+import BoundingSphere from "./BoundingSphere.js";
+import Cartesian3 from "./Cartesian3.js";
+import Check from "./Check.js";
+import ComponentDatatype from "./ComponentDatatype.js";
+import defaultValue from "./defaultValue.js";
+import defined from "./defined.js";
+import DeveloperError from "./DeveloperError.js";
+import Geometry from "./Geometry.js";
+import GeometryAttribute from "./GeometryAttribute.js";
+import GeometryAttributes from "./GeometryAttributes.js";
+import GeometryOffsetAttribute from "./GeometryOffsetAttribute.js";
+import AxisAlignedBoundingBox from "./AxisAlignedBoundingBox.js";
+import PrimitiveType from "./PrimitiveType.js";
+import VertexFormat from "./VertexFormat.js";
 
-    var diffScratch = new Cartesian3();
+var diffScratch = new Cartesian3();
 
-    /**
-     * Describes a cube centered at the origin.
-     *
-     * @alias BoxGeometry
-     * @constructor
-     *
-     * @param {Object} options Object with the following properties:
-     * @param {Cartesian3} options.minimum The minimum x, y, and z coordinates of the box.
-     * @param {Cartesian3} options.maximum The maximum x, y, and z coordinates of the box.
-     * @param {VertexFormat} [options.vertexFormat=VertexFormat.DEFAULT] The vertex attributes to be computed.
-     *
-     * @see BoxGeometry.fromDimensions
-     * @see BoxGeometry.createGeometry
-     * @see Packable
-     *
-     * @demo {@link https://sandcastle.cesium.com/index.html?src=Box.html|Cesium Sandcastle Box Demo}
-     *
-     * @example
-     * var box = new Cesium.BoxGeometry({
-     *   vertexFormat : Cesium.VertexFormat.POSITION_ONLY,
-     *   maximum : new Cesium.Cartesian3(250000.0, 250000.0, 250000.0),
-     *   minimum : new Cesium.Cartesian3(-250000.0, -250000.0, -250000.0)
-     * });
-     * var geometry = Cesium.BoxGeometry.createGeometry(box);
-     */
-    function BoxGeometry(options) {
+/**
+ * Describes a cube centered at the origin.
+ *
+ * @alias BoxGeometry
+ * @constructor
+ *
+ * @param {Object} options Object with the following properties:
+ * @param {Cartesian3} options.minimum The minimum x, y, and z coordinates of the box.
+ * @param {Cartesian3} options.maximum The maximum x, y, and z coordinates of the box.
+ * @param {VertexFormat} [options.vertexFormat=VertexFormat.DEFAULT] The vertex attributes to be computed.
+ *
+ * @see BoxGeometry.fromDimensions
+ * @see BoxGeometry.createGeometry
+ * @see Packable
+ *
+ * @demo {@link https://sandcastle.cesium.com/index.html?src=Box.html|Cesium Sandcastle Box Demo}
+ *
+ * @example
+ * var box = new Cesium.BoxGeometry({
+ *   vertexFormat : Cesium.VertexFormat.POSITION_ONLY,
+ *   maximum : new Cesium.Cartesian3(250000.0, 250000.0, 250000.0),
+ *   minimum : new Cesium.Cartesian3(-250000.0, -250000.0, -250000.0)
+ * });
+ * var geometry = Cesium.BoxGeometry.createGeometry(box);
+ */
+class BoxGeometry {
+    _minimum: Cartesian3;
+    _maximum: Cartesian3;
+    _vertexFormat: VertexFormat;
+    _offsetAttribute: GeometryOffsetAttribute;
+    _workerName: string;
+
+    constructor(options) {
         options = defaultValue(options, defaultValue.EMPTY_OBJECT);
-
         var min = options.minimum;
         var max = options.maximum;
-
         //>>includeStart('debug', pragmas.debug);
-        Check.typeOf.object('min', min);
-        Check.typeOf.object('max', max);
-        if (defined(options.offsetAttribute) && options.offsetAttribute === GeometryOffsetAttribute.TOP) {
-            throw new DeveloperError('GeometryOffsetAttribute.TOP is not a supported options.offsetAttribute for this geometry.');
+        Check.typeOf.object("min", min);
+        Check.typeOf.object("max", max);
+        if (
+            defined(options.offsetAttribute) &&
+            options.offsetAttribute === GeometryOffsetAttribute.TOP
+        ) {
+            throw new DeveloperError(
+                "GeometryOffsetAttribute.TOP is not a supported options.offsetAttribute for this geometry."
+            );
         }
         //>>includeEnd('debug');
-
-        var vertexFormat = defaultValue(options.vertexFormat, VertexFormat.DEFAULT);
-
+        var vertexFormat = defaultValue(
+            options.vertexFormat,
+            VertexFormat.DEFAULT
+        );
         this._minimum = Cartesian3.clone(min);
         this._maximum = Cartesian3.clone(max);
         this._vertexFormat = vertexFormat;
         this._offsetAttribute = options.offsetAttribute;
-        this._workerName = 'createBoxGeometry';
+        this._workerName = "createBoxGeometry";
     }
-
     /**
      * Creates a cube centered at the origin given its dimensions.
      *
@@ -83,27 +94,39 @@ import VertexFormat from './VertexFormat.js';
      *
      * @see BoxGeometry.createGeometry
      */
-    BoxGeometry.fromDimensions = function(options) {
+    static fromDimensions(options: { dimensions: Cartesian3; vertexFormat: VertexFormat; offsetAttribute?: GeometryOffsetAttribute; }): BoxGeometry {
         options = defaultValue(options, defaultValue.EMPTY_OBJECT);
         var dimensions = options.dimensions;
-
         //>>includeStart('debug', pragmas.debug);
-        Check.typeOf.object('dimensions', dimensions);
-        Check.typeOf.number.greaterThanOrEquals('dimensions.x', dimensions.x, 0);
-        Check.typeOf.number.greaterThanOrEquals('dimensions.y', dimensions.y, 0);
-        Check.typeOf.number.greaterThanOrEquals('dimensions.z', dimensions.z, 0);
+        Check.typeOf.object("dimensions", dimensions);
+        Check.typeOf.number.greaterThanOrEquals(
+            "dimensions.x",
+            dimensions.x,
+            0
+        );
+        Check.typeOf.number.greaterThanOrEquals(
+            "dimensions.y",
+            dimensions.y,
+            0
+        );
+        Check.typeOf.number.greaterThanOrEquals(
+            "dimensions.z",
+            dimensions.z,
+            0
+        );
         //>>includeEnd('debug');
-
-        var corner = Cartesian3.multiplyByScalar(dimensions, 0.5, new Cartesian3());
-
+        var corner = Cartesian3.multiplyByScalar(
+            dimensions,
+            0.5,
+            new Cartesian3()
+        );
         return new BoxGeometry({
-            minimum : Cartesian3.negate(corner, new Cartesian3()),
-            maximum : corner,
-            vertexFormat : options.vertexFormat,
-            offsetAttribute: options.offsetAttribute
+            minimum: Cartesian3.negate(corner, new Cartesian3()),
+            maximum: corner,
+            vertexFormat: options.vertexFormat,
+            offsetAttribute: options.offsetAttribute,
         });
-    };
-
+    }
     /**
      * Creates a cube from the dimensions of an AxisAlignedBoundingBox.
      *
@@ -124,23 +147,15 @@ import VertexFormat from './VertexFormat.js';
      *
      * @see BoxGeometry.createGeometry
      */
-    BoxGeometry.fromAxisAlignedBoundingBox = function (boundingBox) {
+    static fromAxisAlignedBoundingBox(boundingBox: AxisAlignedBoundingBox): BoxGeometry {
         //>>includeStart('debug', pragmas.debug);
-        Check.typeOf.object('boundingBox', boundingBox);
+        Check.typeOf.object("boundingBox", boundingBox);
         //>>includeEnd('debug');
-
         return new BoxGeometry({
-            minimum : boundingBox.minimum,
-            maximum : boundingBox.maximum
+            minimum: boundingBox.minimum,
+            maximum: boundingBox.maximum,
         });
-    };
-
-    /**
-     * The number of elements used to pack the object into an array.
-     * @type {Number}
-     */
-    BoxGeometry.packedLength = 2 * Cartesian3.packedLength + VertexFormat.packedLength + 1;
-
+    }
     /**
      * Stores the provided instance into the provided array.
      *
@@ -150,32 +165,30 @@ import VertexFormat from './VertexFormat.js';
      *
      * @returns {Number[]} The array that was packed into
      */
-    BoxGeometry.pack = function(value, array, startingIndex) {
+    static pack(value: BoxGeometry, array: number[], startingIndex: number): number[] {
         //>>includeStart('debug', pragmas.debug);
-        Check.typeOf.object('value', value);
-        Check.defined('array', array);
+        Check.typeOf.object("value", value);
+        Check.defined("array", array);
         //>>includeEnd('debug');
-
         startingIndex = defaultValue(startingIndex, 0);
-
         Cartesian3.pack(value._minimum, array, startingIndex);
-        Cartesian3.pack(value._maximum, array, startingIndex + Cartesian3.packedLength);
-        VertexFormat.pack(value._vertexFormat, array, startingIndex + 2 * Cartesian3.packedLength);
-        array[startingIndex + 2 * Cartesian3.packedLength + VertexFormat.packedLength] = defaultValue(value._offsetAttribute, -1);
-
+        Cartesian3.pack(
+            value._maximum,
+            array,
+            startingIndex + Cartesian3.packedLength
+        );
+        VertexFormat.pack(
+            value._vertexFormat,
+            array,
+            startingIndex + 2 * Cartesian3.packedLength
+        );
+        array[
+            startingIndex +
+                2 * Cartesian3.packedLength +
+                VertexFormat.packedLength
+        ] = defaultValue(value._offsetAttribute, -1);
         return array;
-    };
-
-    var scratchMin = new Cartesian3();
-    var scratchMax = new Cartesian3();
-    var scratchVertexFormat = new VertexFormat();
-    var scratchOptions = {
-        minimum: scratchMin,
-        maximum: scratchMax,
-        vertexFormat: scratchVertexFormat,
-        offsetAttribute : undefined
-    };
-
+    }
     /**
      * Retrieves an instance from a packed array.
      *
@@ -184,70 +197,82 @@ import VertexFormat from './VertexFormat.js';
      * @param {BoxGeometry} [result] The object into which to store the result.
      * @returns {BoxGeometry} The modified result parameter or a new BoxGeometry instance if one was not provided.
      */
-    BoxGeometry.unpack = function(array, startingIndex, result) {
+    static unpack(array: number[], startingIndex: number, result: BoxGeometry): BoxGeometry {
         //>>includeStart('debug', pragmas.debug);
-        Check.defined('array', array);
+        Check.defined("array", array);
         //>>includeEnd('debug');
-
         startingIndex = defaultValue(startingIndex, 0);
-
         var min = Cartesian3.unpack(array, startingIndex, scratchMin);
-        var max = Cartesian3.unpack(array, startingIndex + Cartesian3.packedLength, scratchMax);
-        var vertexFormat = VertexFormat.unpack(array, startingIndex + 2 * Cartesian3.packedLength, scratchVertexFormat);
-        var offsetAttribute = array[startingIndex + 2 * Cartesian3.packedLength + VertexFormat.packedLength];
-
+        var max = Cartesian3.unpack(
+            array,
+            startingIndex + Cartesian3.packedLength,
+            scratchMax
+        );
+        var vertexFormat = VertexFormat.unpack(
+            array,
+            startingIndex + 2 * Cartesian3.packedLength,
+            scratchVertexFormat
+        );
+        var offsetAttribute =
+            array[
+                startingIndex +
+                    2 * Cartesian3.packedLength +
+                    VertexFormat.packedLength
+            ];
         if (!defined(result)) {
-            scratchOptions.offsetAttribute = offsetAttribute === -1 ? undefined : offsetAttribute;
+            scratchOptions.offsetAttribute =
+                offsetAttribute === -1 ? undefined : offsetAttribute;
             return new BoxGeometry(scratchOptions);
         }
-
         result._minimum = Cartesian3.clone(min, result._minimum);
         result._maximum = Cartesian3.clone(max, result._maximum);
-        result._vertexFormat = VertexFormat.clone(vertexFormat, result._vertexFormat);
-        result._offsetAttribute = offsetAttribute === -1 ? undefined : offsetAttribute;
-
+        result._vertexFormat = VertexFormat.clone(
+            vertexFormat,
+            result._vertexFormat
+        );
+        result._offsetAttribute =
+            offsetAttribute === -1 ? undefined : offsetAttribute;
         return result;
-    };
-
+    }
     /**
      * Computes the geometric representation of a box, including its vertices, indices, and a bounding sphere.
      *
      * @param {BoxGeometry} boxGeometry A description of the box.
      * @returns {Geometry|undefined} The computed vertices and indices.
      */
-    BoxGeometry.createGeometry = function(boxGeometry) {
+    static createGeometry(boxGeometry: BoxGeometry): Geometry | undefined {
         var min = boxGeometry._minimum;
         var max = boxGeometry._maximum;
         var vertexFormat = boxGeometry._vertexFormat;
-
         if (Cartesian3.equals(min, max)) {
             return;
         }
-
         var attributes = new GeometryAttributes();
         var indices;
         var positions;
-
-        if (vertexFormat.position &&
-                (vertexFormat.st || vertexFormat.normal || vertexFormat.tangent || vertexFormat.bitangent)) {
+        if (
+            vertexFormat.position &&
+            (vertexFormat.st ||
+                vertexFormat.normal ||
+                vertexFormat.tangent ||
+                vertexFormat.bitangent)
+        ) {
             if (vertexFormat.position) {
                 // 8 corner points.  Duplicated 3 times each for each incident edge/face.
                 positions = new Float64Array(6 * 4 * 3);
-
                 // +z face
-                positions[0]  = min.x;
-                positions[1]  = min.y;
-                positions[2]  = max.z;
-                positions[3]  = max.x;
-                positions[4]  = min.y;
-                positions[5]  = max.z;
-                positions[6]  = max.x;
-                positions[7]  = max.y;
-                positions[8]  = max.z;
-                positions[9]  = min.x;
+                positions[0] = min.x;
+                positions[1] = min.y;
+                positions[2] = max.z;
+                positions[3] = max.x;
+                positions[4] = min.y;
+                positions[5] = max.z;
+                positions[6] = max.x;
+                positions[7] = max.y;
+                positions[8] = max.z;
+                positions[9] = min.x;
                 positions[10] = max.y;
                 positions[11] = max.z;
-
                 // -z face
                 positions[12] = min.x;
                 positions[13] = min.y;
@@ -261,7 +286,6 @@ import VertexFormat from './VertexFormat.js';
                 positions[21] = min.x;
                 positions[22] = max.y;
                 positions[23] = min.z;
-
                 // +x face
                 positions[24] = max.x;
                 positions[25] = min.y;
@@ -275,7 +299,6 @@ import VertexFormat from './VertexFormat.js';
                 positions[33] = max.x;
                 positions[34] = min.y;
                 positions[35] = max.z;
-
                 // -x face
                 positions[36] = min.x;
                 positions[37] = min.y;
@@ -289,7 +312,6 @@ import VertexFormat from './VertexFormat.js';
                 positions[45] = min.x;
                 positions[46] = min.y;
                 positions[47] = max.z;
-
                 // +y face
                 positions[48] = min.x;
                 positions[49] = max.y;
@@ -303,7 +325,6 @@ import VertexFormat from './VertexFormat.js';
                 positions[57] = min.x;
                 positions[58] = max.y;
                 positions[59] = max.z;
-
                 // -y face
                 positions[60] = min.x;
                 positions[61] = min.y;
@@ -317,31 +338,27 @@ import VertexFormat from './VertexFormat.js';
                 positions[69] = min.x;
                 positions[70] = min.y;
                 positions[71] = max.z;
-
                 attributes.position = new GeometryAttribute({
-                    componentDatatype : ComponentDatatype.DOUBLE,
-                    componentsPerAttribute : 3,
-                    values : positions
+                    componentDatatype: ComponentDatatype.DOUBLE,
+                    componentsPerAttribute: 3,
+                    values: positions,
                 });
             }
-
             if (vertexFormat.normal) {
                 var normals = new Float32Array(6 * 4 * 3);
-
                 // +z face
-                normals[0]  = 0.0;
-                normals[1]  = 0.0;
-                normals[2]  = 1.0;
-                normals[3]  = 0.0;
-                normals[4]  = 0.0;
-                normals[5]  = 1.0;
-                normals[6]  = 0.0;
-                normals[7]  = 0.0;
-                normals[8]  = 1.0;
-                normals[9]  = 0.0;
+                normals[0] = 0.0;
+                normals[1] = 0.0;
+                normals[2] = 1.0;
+                normals[3] = 0.0;
+                normals[4] = 0.0;
+                normals[5] = 1.0;
+                normals[6] = 0.0;
+                normals[7] = 0.0;
+                normals[8] = 1.0;
+                normals[9] = 0.0;
                 normals[10] = 0.0;
                 normals[11] = 1.0;
-
                 // -z face
                 normals[12] = 0.0;
                 normals[13] = 0.0;
@@ -355,7 +372,6 @@ import VertexFormat from './VertexFormat.js';
                 normals[21] = 0.0;
                 normals[22] = 0.0;
                 normals[23] = -1.0;
-
                 // +x face
                 normals[24] = 1.0;
                 normals[25] = 0.0;
@@ -369,7 +385,6 @@ import VertexFormat from './VertexFormat.js';
                 normals[33] = 1.0;
                 normals[34] = 0.0;
                 normals[35] = 0.0;
-
                 // -x face
                 normals[36] = -1.0;
                 normals[37] = 0.0;
@@ -383,7 +398,6 @@ import VertexFormat from './VertexFormat.js';
                 normals[45] = -1.0;
                 normals[46] = 0.0;
                 normals[47] = 0.0;
-
                 // +y face
                 normals[48] = 0.0;
                 normals[49] = 1.0;
@@ -397,7 +411,6 @@ import VertexFormat from './VertexFormat.js';
                 normals[57] = 0.0;
                 normals[58] = 1.0;
                 normals[59] = 0.0;
-
                 // -y face
                 normals[60] = 0.0;
                 normals[61] = -1.0;
@@ -411,37 +424,32 @@ import VertexFormat from './VertexFormat.js';
                 normals[69] = 0.0;
                 normals[70] = -1.0;
                 normals[71] = 0.0;
-
                 attributes.normal = new GeometryAttribute({
-                    componentDatatype : ComponentDatatype.FLOAT,
-                    componentsPerAttribute : 3,
-                    values : normals
+                    componentDatatype: ComponentDatatype.FLOAT,
+                    componentsPerAttribute: 3,
+                    values: normals,
                 });
             }
-
             if (vertexFormat.st) {
                 var texCoords = new Float32Array(6 * 4 * 2);
-
                 // +z face
-                texCoords[0]  = 0.0;
-                texCoords[1]  = 0.0;
-                texCoords[2]  = 1.0;
-                texCoords[3]  = 0.0;
-                texCoords[4]  = 1.0;
-                texCoords[5]  = 1.0;
-                texCoords[6]  = 0.0;
-                texCoords[7]  = 1.0;
-
+                texCoords[0] = 0.0;
+                texCoords[1] = 0.0;
+                texCoords[2] = 1.0;
+                texCoords[3] = 0.0;
+                texCoords[4] = 1.0;
+                texCoords[5] = 1.0;
+                texCoords[6] = 0.0;
+                texCoords[7] = 1.0;
                 // -z face
-                texCoords[8]  = 1.0;
-                texCoords[9]  = 0.0;
+                texCoords[8] = 1.0;
+                texCoords[9] = 0.0;
                 texCoords[10] = 0.0;
                 texCoords[11] = 0.0;
                 texCoords[12] = 0.0;
                 texCoords[13] = 1.0;
                 texCoords[14] = 1.0;
                 texCoords[15] = 1.0;
-
                 //+x face
                 texCoords[16] = 0.0;
                 texCoords[17] = 0.0;
@@ -451,7 +459,6 @@ import VertexFormat from './VertexFormat.js';
                 texCoords[21] = 1.0;
                 texCoords[22] = 0.0;
                 texCoords[23] = 1.0;
-
                 // -x face
                 texCoords[24] = 1.0;
                 texCoords[25] = 0.0;
@@ -461,7 +468,6 @@ import VertexFormat from './VertexFormat.js';
                 texCoords[29] = 1.0;
                 texCoords[30] = 1.0;
                 texCoords[31] = 1.0;
-
                 // +y face
                 texCoords[32] = 1.0;
                 texCoords[33] = 0.0;
@@ -471,7 +477,6 @@ import VertexFormat from './VertexFormat.js';
                 texCoords[37] = 1.0;
                 texCoords[38] = 1.0;
                 texCoords[39] = 1.0;
-
                 // -y face
                 texCoords[40] = 0.0;
                 texCoords[41] = 0.0;
@@ -481,31 +486,27 @@ import VertexFormat from './VertexFormat.js';
                 texCoords[45] = 1.0;
                 texCoords[46] = 0.0;
                 texCoords[47] = 1.0;
-
                 attributes.st = new GeometryAttribute({
-                    componentDatatype : ComponentDatatype.FLOAT,
-                    componentsPerAttribute : 2,
-                    values : texCoords
+                    componentDatatype: ComponentDatatype.FLOAT,
+                    componentsPerAttribute: 2,
+                    values: texCoords,
                 });
             }
-
             if (vertexFormat.tangent) {
                 var tangents = new Float32Array(6 * 4 * 3);
-
                 // +z face
-                tangents[0]  = 1.0;
-                tangents[1]  = 0.0;
-                tangents[2]  = 0.0;
-                tangents[3]  = 1.0;
-                tangents[4]  = 0.0;
-                tangents[5]  = 0.0;
-                tangents[6]  = 1.0;
-                tangents[7]  = 0.0;
-                tangents[8]  = 0.0;
-                tangents[9]  = 1.0;
+                tangents[0] = 1.0;
+                tangents[1] = 0.0;
+                tangents[2] = 0.0;
+                tangents[3] = 1.0;
+                tangents[4] = 0.0;
+                tangents[5] = 0.0;
+                tangents[6] = 1.0;
+                tangents[7] = 0.0;
+                tangents[8] = 0.0;
+                tangents[9] = 1.0;
                 tangents[10] = 0.0;
                 tangents[11] = 0.0;
-
                 // -z face
                 tangents[12] = -1.0;
                 tangents[13] = 0.0;
@@ -519,7 +520,6 @@ import VertexFormat from './VertexFormat.js';
                 tangents[21] = -1.0;
                 tangents[22] = 0.0;
                 tangents[23] = 0.0;
-
                 // +x face
                 tangents[24] = 0.0;
                 tangents[25] = 1.0;
@@ -533,7 +533,6 @@ import VertexFormat from './VertexFormat.js';
                 tangents[33] = 0.0;
                 tangents[34] = 1.0;
                 tangents[35] = 0.0;
-
                 // -x face
                 tangents[36] = 0.0;
                 tangents[37] = -1.0;
@@ -547,7 +546,6 @@ import VertexFormat from './VertexFormat.js';
                 tangents[45] = 0.0;
                 tangents[46] = -1.0;
                 tangents[47] = 0.0;
-
                 // +y face
                 tangents[48] = -1.0;
                 tangents[49] = 0.0;
@@ -561,7 +559,6 @@ import VertexFormat from './VertexFormat.js';
                 tangents[57] = -1.0;
                 tangents[58] = 0.0;
                 tangents[59] = 0.0;
-
                 // -y face
                 tangents[60] = 1.0;
                 tangents[61] = 0.0;
@@ -575,17 +572,14 @@ import VertexFormat from './VertexFormat.js';
                 tangents[69] = 1.0;
                 tangents[70] = 0.0;
                 tangents[71] = 0.0;
-
                 attributes.tangent = new GeometryAttribute({
-                    componentDatatype : ComponentDatatype.FLOAT,
-                    componentsPerAttribute : 3,
-                    values : tangents
+                    componentDatatype: ComponentDatatype.FLOAT,
+                    componentsPerAttribute: 3,
+                    values: tangents,
                 });
             }
-
             if (vertexFormat.bitangent) {
                 var bitangents = new Float32Array(6 * 4 * 3);
-
                 // +z face
                 bitangents[0] = 0.0;
                 bitangents[1] = 1.0;
@@ -599,7 +593,6 @@ import VertexFormat from './VertexFormat.js';
                 bitangents[9] = 0.0;
                 bitangents[10] = 1.0;
                 bitangents[11] = 0.0;
-
                 // -z face
                 bitangents[12] = 0.0;
                 bitangents[13] = 1.0;
@@ -613,7 +606,6 @@ import VertexFormat from './VertexFormat.js';
                 bitangents[21] = 0.0;
                 bitangents[22] = 1.0;
                 bitangents[23] = 0.0;
-
                 // +x face
                 bitangents[24] = 0.0;
                 bitangents[25] = 0.0;
@@ -627,7 +619,6 @@ import VertexFormat from './VertexFormat.js';
                 bitangents[33] = 0.0;
                 bitangents[34] = 0.0;
                 bitangents[35] = 1.0;
-
                 // -x face
                 bitangents[36] = 0.0;
                 bitangents[37] = 0.0;
@@ -641,7 +632,6 @@ import VertexFormat from './VertexFormat.js';
                 bitangents[45] = 0.0;
                 bitangents[46] = 0.0;
                 bitangents[47] = 1.0;
-
                 // +y face
                 bitangents[48] = 0.0;
                 bitangents[49] = 0.0;
@@ -655,7 +645,6 @@ import VertexFormat from './VertexFormat.js';
                 bitangents[57] = 0.0;
                 bitangents[58] = 0.0;
                 bitangents[59] = 1.0;
-
                 // -y face
                 bitangents[60] = 0.0;
                 bitangents[61] = 0.0;
@@ -669,17 +658,14 @@ import VertexFormat from './VertexFormat.js';
                 bitangents[69] = 0.0;
                 bitangents[70] = 0.0;
                 bitangents[71] = 1.0;
-
                 attributes.bitangent = new GeometryAttribute({
-                    componentDatatype : ComponentDatatype.FLOAT,
-                    componentsPerAttribute : 3,
-                    values : bitangents
+                    componentDatatype: ComponentDatatype.FLOAT,
+                    componentsPerAttribute: 3,
+                    values: bitangents,
                 });
             }
-
             // 12 triangles:  6 faces, 2 triangles each.
             indices = new Uint16Array(6 * 2 * 3);
-
             // +z face
             indices[0] = 0;
             indices[1] = 1;
@@ -687,7 +673,6 @@ import VertexFormat from './VertexFormat.js';
             indices[3] = 0;
             indices[4] = 2;
             indices[5] = 3;
-
             // -z face
             indices[6] = 4 + 2;
             indices[7] = 4 + 1;
@@ -695,7 +680,6 @@ import VertexFormat from './VertexFormat.js';
             indices[9] = 4 + 3;
             indices[10] = 4 + 2;
             indices[11] = 4 + 0;
-
             // +x face
             indices[12] = 8 + 0;
             indices[13] = 8 + 1;
@@ -703,7 +687,6 @@ import VertexFormat from './VertexFormat.js';
             indices[15] = 8 + 0;
             indices[16] = 8 + 2;
             indices[17] = 8 + 3;
-
             // -x face
             indices[18] = 12 + 2;
             indices[19] = 12 + 1;
@@ -711,7 +694,6 @@ import VertexFormat from './VertexFormat.js';
             indices[21] = 12 + 3;
             indices[22] = 12 + 2;
             indices[23] = 12 + 0;
-
             // +y face
             indices[24] = 16 + 2;
             indices[25] = 16 + 1;
@@ -719,7 +701,6 @@ import VertexFormat from './VertexFormat.js';
             indices[27] = 16 + 3;
             indices[28] = 16 + 2;
             indices[29] = 16 + 0;
-
             // -y face
             indices[30] = 20 + 0;
             indices[31] = 20 + 1;
@@ -730,7 +711,6 @@ import VertexFormat from './VertexFormat.js';
         } else {
             // Positions only - no need to duplicate corner points
             positions = new Float64Array(8 * 3);
-
             positions[0] = min.x;
             positions[1] = min.y;
             positions[2] = min.z;
@@ -755,16 +735,13 @@ import VertexFormat from './VertexFormat.js';
             positions[21] = min.x;
             positions[22] = max.y;
             positions[23] = max.z;
-
             attributes.position = new GeometryAttribute({
-                componentDatatype : ComponentDatatype.DOUBLE,
-                componentsPerAttribute : 3,
-                values : positions
+                componentDatatype: ComponentDatatype.DOUBLE,
+                componentsPerAttribute: 3,
+                values: positions,
             });
-
             // 12 triangles:  6 faces, 2 triangles each.
             indices = new Uint16Array(6 * 2 * 3);
-
             // plane z = corner.Z
             indices[0] = 4;
             indices[1] = 5;
@@ -772,7 +749,6 @@ import VertexFormat from './VertexFormat.js';
             indices[3] = 4;
             indices[4] = 6;
             indices[5] = 7;
-
             // plane z = -corner.Z
             indices[6] = 1;
             indices[7] = 0;
@@ -780,7 +756,6 @@ import VertexFormat from './VertexFormat.js';
             indices[9] = 1;
             indices[10] = 3;
             indices[11] = 2;
-
             // plane x = corner.X
             indices[12] = 1;
             indices[13] = 6;
@@ -788,7 +763,6 @@ import VertexFormat from './VertexFormat.js';
             indices[15] = 1;
             indices[16] = 2;
             indices[17] = 6;
-
             // plane y = corner.Y
             indices[18] = 2;
             indices[19] = 3;
@@ -796,7 +770,6 @@ import VertexFormat from './VertexFormat.js';
             indices[21] = 2;
             indices[22] = 7;
             indices[23] = 6;
-
             // plane x = -corner.X
             indices[24] = 3;
             indices[25] = 0;
@@ -804,7 +777,6 @@ import VertexFormat from './VertexFormat.js';
             indices[27] = 3;
             indices[28] = 4;
             indices[29] = 7;
-
             // plane y = -corner.Y
             indices[30] = 0;
             indices[31] = 1;
@@ -813,46 +785,66 @@ import VertexFormat from './VertexFormat.js';
             indices[34] = 5;
             indices[35] = 4;
         }
-
         var diff = Cartesian3.subtract(max, min, diffScratch);
         var radius = Cartesian3.magnitude(diff) * 0.5;
-
         if (defined(boxGeometry._offsetAttribute)) {
             var length = positions.length;
             var applyOffset = new Uint8Array(length / 3);
-            var offsetValue = boxGeometry._offsetAttribute === GeometryOffsetAttribute.NONE ? 0 : 1;
+            var offsetValue =
+                boxGeometry._offsetAttribute === GeometryOffsetAttribute.NONE
+                    ? 0
+                    : 1;
             arrayFill(applyOffset, offsetValue);
             attributes.applyOffset = new GeometryAttribute({
-                componentDatatype : ComponentDatatype.UNSIGNED_BYTE,
-                componentsPerAttribute : 1,
-                values: applyOffset
+                componentDatatype: ComponentDatatype.UNSIGNED_BYTE,
+                componentsPerAttribute: 1,
+                values: applyOffset,
             });
         }
-
         return new Geometry({
-            attributes : attributes,
-            indices : indices,
-            primitiveType : PrimitiveType.TRIANGLES,
-            boundingSphere : new BoundingSphere(Cartesian3.ZERO, radius),
-            offsetAttribute : boxGeometry._offsetAttribute
+            attributes: attributes,
+            indices: indices,
+            primitiveType: PrimitiveType.TRIANGLES,
+            boundingSphere: new BoundingSphere(Cartesian3.ZERO, radius),
+            offsetAttribute: boxGeometry._offsetAttribute,
         });
-    };
-
-    var unitBoxGeometry;
-
+    }
     /**
      * Returns the geometric representation of a unit box, including its vertices, indices, and a bounding sphere.
      * @returns {Geometry} The computed vertices and indices.
      *
      * @private
      */
-    BoxGeometry.getUnitBox = function() {
+    static getUnitBox(): Geometry {
         if (!defined(unitBoxGeometry)) {
-            unitBoxGeometry = BoxGeometry.createGeometry(BoxGeometry.fromDimensions({
-                dimensions : new Cartesian3(1.0, 1.0, 1.0),
-                vertexFormat : VertexFormat.POSITION_ONLY
-            }));
+            unitBoxGeometry = BoxGeometry.createGeometry(
+                BoxGeometry.fromDimensions({
+                    dimensions: new Cartesian3(1.0, 1.0, 1.0),
+                    vertexFormat: VertexFormat.POSITION_ONLY,
+                })
+            );
         }
         return unitBoxGeometry;
-    };
+    }
+
+    /**
+     * The number of elements used to pack the object into an array.
+     * @type {Number}
+     */
+    static packedLength: number =
+        2 * Cartesian3.packedLength + VertexFormat.packedLength + 1;
+}
+
+var scratchMin = new Cartesian3();
+var scratchMax = new Cartesian3();
+var scratchVertexFormat = new VertexFormat();
+var scratchOptions = {
+    minimum: scratchMin,
+    maximum: scratchMax,
+    vertexFormat: scratchVertexFormat,
+    offsetAttribute: undefined,
+};
+
+var unitBoxGeometry;
+
 export default BoxGeometry;

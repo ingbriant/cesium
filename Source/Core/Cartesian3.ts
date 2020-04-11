@@ -24,31 +24,32 @@ declare class Ellipsoid {
         /**
          * The X component.
          * @default 0.0
+         * @member {Number} x
+         * @memberof Cartesian3.prototype
          */
-        x: number;
 
         /**
          * The Y component.
          * @default 0.0
+         * @member {Number} y
+         * @memberof Cartesian3.prototype
          */
-        y: number;
 
         /**
          * The Z component.
          * @default 0.0
+         * @member {Number} z
+         * @memberof Cartesian3.prototype
          */
-        z: number;
 
         /**
          * @param {Number} [x] The X component.
          * @param {Number} [y] The Y component.
          * @param {Number} [z] The Z component.
          */
-        constructor(x = 0, y = 0, z = 0){
-            this.x = x;
-            this.y = y;
-            this.z = z;
+        constructor(public x: number = 0, public y: number = 0, public z: number = 0){
         }
+
 
     /**
      * Converts the provided Spherical into Cartesian3 coordinates.
@@ -126,7 +127,9 @@ declare class Ellipsoid {
      * @param {Cartesian3} [result] The object onto which to store the result.
      * @returns {Cartesian3} The modified result parameter or a new Cartesian3 instance if one was not provided.
      */
-    static fromCartesian4 = Cartesian3.clone;
+    static fromCartesian4(cartesian?: Cartesian3, result?: Cartesian3): Cartesian3 {
+        return Cartesian3.clone(cartesian, result);
+    };
 
     /**
      * The number of elements used to pack the object into an array.
@@ -254,7 +257,9 @@ declare class Ellipsoid {
      * var v2 = [0.0, 0.0, 1.0, 2.0, 3.0];
      * var p2 = Cesium.Cartesian3.fromArray(v2, 2);
      */
-    static fromArray = Cartesian3.unpack;
+    static fromArray(array: number[], startingIndex: number = 0, result?: Cartesian3): Cartesian3 {
+        return Cartesian3.unpack(array, startingIndex, result);
+    };
 
     /**
      * Computes the value of the maximum component for the supplied Cartesian.
