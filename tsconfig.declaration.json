@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "outDir": "Build/TypeScript",
+        "allowJs": true,
+        "declaration": true,
+        "emitDeclarationOnly": true
+    },
+    "include": [
+        "Source/**/*"
+    ],
+    "exclude": [
+        "Source/Shaders/*",
+        "Source/Shaders/**/*",
+        "Source/ThirdParty/*",
+        "Source/ThirdParty/**/*",
+        "Source/Workers/*",
+        "Source/Workers/**/*",
+        "Source/WorkersES6/*",
+        "Source/WorkersES6/**/*"
+    ]
+}
