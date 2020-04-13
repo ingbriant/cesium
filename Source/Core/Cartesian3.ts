@@ -717,7 +717,7 @@ declare class Ellipsoid {
     /**
      * @private
      */
-    static equalsArray(cartesian: Cartesian3, array: number[], offset: number) {
+    static equalsArray(cartesian: Cartesian3, array: number[], offset: number): boolean {
         return cartesian.x === array[offset] &&
                cartesian.y === array[offset + 1] &&
                cartesian.z === array[offset + 2];
