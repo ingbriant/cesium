@@ -832,16 +832,16 @@ describe(
         // Render without shadows
         scene.shadowMap.enabled = false;
         var unshadowedColor;
+        //eslint-disable-next-line no-loop-func
         renderAndCall(function (rgba) {
-          //eslint-disable-line no-loop-func
           unshadowedColor = rgba;
           expect(rgba).not.toEqual(backgroundColor);
         });
 
         // Render with shadows
         scene.shadowMap.enabled = true;
+        //eslint-disable-next-line no-loop-func
         renderAndCall(function (rgba) {
-          //eslint-disable-line no-loop-func
           expect(rgba).not.toEqual(backgroundColor);
           expect(rgba).not.toEqual(unshadowedColor);
         });

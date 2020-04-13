@@ -2835,8 +2835,8 @@ describe(
         }
         Matrix4.multiplyByMatrix3(m.modelMatrix, rotate, m.modelMatrix);
 
+        //eslint-disable-next-line no-loop-func
         expect(scene).toRenderAndCall(function (rgba) {
-          //eslint-disable-line no-loop-func
           expect(rgba).not.toEqual([0, 0, 0, 255]);
           expect(rgba).not.toEqual(oldPixelColor);
           oldPixelColor = rgba;

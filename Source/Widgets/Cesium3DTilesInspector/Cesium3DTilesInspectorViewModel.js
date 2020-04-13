@@ -381,6 +381,7 @@ function Cesium3DTilesInspectorViewModel(scene, performanceContainer) {
   this.colorBlendMode = Cesium3DTileColorBlendMode.HIGHLIGHT;
 
   var picking = knockout.observable();
+  var showOnlyPickedTileDebugLabel = knockout.observable();
   knockout.defineProperty(this, "picking", {
     get: function () {
       return picking();
@@ -567,7 +568,6 @@ function Cesium3DTilesInspectorViewModel(scene, performanceContainer) {
    */
   this.freezeFrame = false;
 
-  var showOnlyPickedTileDebugLabel = knockout.observable();
   knockout.defineProperty(this, "showOnlyPickedTileDebugLabel", {
     get: function () {
       return showOnlyPickedTileDebugLabel();

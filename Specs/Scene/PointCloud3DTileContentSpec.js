@@ -541,8 +541,8 @@ describe(
             /* jshint loopfunc: true */
             while (defined(picked)) {
               picked.show = false;
+              //eslint-disable-next-line no-loop-func
               expect(scene).toPickAndCall(function (result) {
-                //eslint-disable-line no-loop-func
                 picked = result;
               });
               ++pickedCountCulling;
@@ -565,8 +565,8 @@ describe(
             /* jshint loopfunc: true */
             while (defined(picked)) {
               picked.show = false;
+              //eslint-disable-next-line no-loop-func
               expect(scene).toPickAndCall(function (result) {
-                //eslint-disable-line no-loop-func
                 picked = result;
               });
               ++pickedCount;

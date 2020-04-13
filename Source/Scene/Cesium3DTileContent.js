@@ -39,8 +39,8 @@ Object.defineProperties(Cesium3DTileContent.prototype, {
    * @readonly
    */
   featuresLength: {
+    // eslint-disable-next-line getter-return
     get: function () {
-      // eslint-disable-line getter-return
       DeveloperError.throwInstantiationError();
     },
   },
@@ -60,8 +60,8 @@ Object.defineProperties(Cesium3DTileContent.prototype, {
    * @readonly
    */
   pointsLength: {
+    // eslint-disable-next-line getter-return
     get: function () {
-      // eslint-disable-line getter-return
       DeveloperError.throwInstantiationError();
     },
   },
@@ -75,8 +75,8 @@ Object.defineProperties(Cesium3DTileContent.prototype, {
    * @readonly
    */
   trianglesLength: {
+    // eslint-disable-next-line getter-return
     get: function () {
-      // eslint-disable-line getter-return
       DeveloperError.throwInstantiationError();
     },
   },
@@ -90,8 +90,8 @@ Object.defineProperties(Cesium3DTileContent.prototype, {
    * @readonly
    */
   geometryByteLength: {
+    // eslint-disable-next-line getter-return
     get: function () {
-      // eslint-disable-line getter-return
       DeveloperError.throwInstantiationError();
     },
   },
@@ -105,8 +105,8 @@ Object.defineProperties(Cesium3DTileContent.prototype, {
    * @readonly
    */
   texturesByteLength: {
+    // eslint-disable-next-line getter-return
     get: function () {
-      // eslint-disable-line getter-return
       DeveloperError.throwInstantiationError();
     },
   },
@@ -120,8 +120,8 @@ Object.defineProperties(Cesium3DTileContent.prototype, {
    * @readonly
    */
   batchTableByteLength: {
+    // eslint-disable-next-line getter-return
     get: function () {
-      // eslint-disable-line getter-return
       DeveloperError.throwInstantiationError();
     },
   },
@@ -138,8 +138,8 @@ Object.defineProperties(Cesium3DTileContent.prototype, {
    * @readonly
    */
   innerContents: {
+    // eslint-disable-next-line getter-return
     get: function () {
-      // eslint-disable-line getter-return
       DeveloperError.throwInstantiationError();
     },
   },
@@ -153,8 +153,8 @@ Object.defineProperties(Cesium3DTileContent.prototype, {
    * @readonly
    */
   readyPromise: {
+    // eslint-disable-next-line getter-return
     get: function () {
-      // eslint-disable-line getter-return
       DeveloperError.throwInstantiationError();
     },
   },
@@ -168,8 +168,8 @@ Object.defineProperties(Cesium3DTileContent.prototype, {
    * @readonly
    */
   tileset: {
+    // eslint-disable-next-line getter-return
     get: function () {
-      // eslint-disable-line getter-return
       DeveloperError.throwInstantiationError();
     },
   },
@@ -183,8 +183,8 @@ Object.defineProperties(Cesium3DTileContent.prototype, {
    * @readonly
    */
   tile: {
+    // eslint-disable-next-line getter-return
     get: function () {
-      // eslint-disable-line getter-return
       DeveloperError.throwInstantiationError();
     },
   },
@@ -197,8 +197,8 @@ Object.defineProperties(Cesium3DTileContent.prototype, {
    * @readonly
    */
   url: {
+    // eslint-disable-next-line getter-return
     get: function () {
-      // eslint-disable-line getter-return
       DeveloperError.throwInstantiationError();
     },
   },
@@ -216,8 +216,8 @@ Object.defineProperties(Cesium3DTileContent.prototype, {
    * @private
    */
   batchTable: {
+    // eslint-disable-next-line getter-return
     get: function () {
-      // eslint-disable-line getter-return
       DeveloperError.throwInstantiationError();
     },
   },
