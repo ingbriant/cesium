@@ -90,10 +90,9 @@ A few more naming conventions are introduced below along with their design patte
 
 ## Formatting
 
-We use [prettier](https://prettier.io/) to automatically re-format all JS code at commit time, so all of the work is done for you.
-
-* For HTML code, simple keep the existing style. Use double quotes.
-* Text files, including JavaScript files, end with a newline to minimize the noise in diffs.
+* We use [prettier](https://prettier.io/) to automatically re-format all JS code at commit time, so all of the work is done for you. Code is automatically reformatted when you commit.
+* For HTML code, keep the existing style. Use double quotes.
+* Text files, end with a newline to minimize the noise in diffs.
 
 ## Linting
 
