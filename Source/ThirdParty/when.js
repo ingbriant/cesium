@@ -507,7 +507,7 @@
 
 	/**
 	 * Joins multiple promises into a single returned promise.
-	 * @returns {Promise} a promise that will fulfill when *all* the input promises
+	 * @returns a promise that will fulfill when *all* the input promises
 	 * have fulfilled, or will reject when *any one* of the input promises rejects.
 	 */
 	function join(/* ...promises */) {

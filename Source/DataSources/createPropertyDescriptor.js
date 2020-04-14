@@ -2,6 +2,9 @@ import defaultValue from '../Core/defaultValue.js';
 import defined from '../Core/defined.js';
 import ConstantProperty from './ConstantProperty.js';
 
+    /**
+     * @returns {*}
+     */
     function createProperty(name, privateName, subscriptionName, configurable, createPropertyCallback) {
         return {
             configurable : configurable,

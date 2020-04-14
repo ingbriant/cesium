@@ -1,4 +1,5 @@
 import Cartesian2 from '../../Core/Cartesian2.js';
+import Cartesian3 from '../../Core/Cartesian3.js'; //eslint-disable-line no-unused-vars
 import defaultValue from '../../Core/defaultValue.js';
 import defined from '../../Core/defined.js';
 import DeveloperError from '../../Core/DeveloperError.js';
