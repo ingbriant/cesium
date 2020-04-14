@@ -193,7 +193,9 @@ import Property from './Property.js';
         options.dimensions = plane.dimensions.getValue(Iso8601.MINIMUM_VALUE, options.dimensions);
     };
 
-    PlaneGeometryUpdater.DynamicGeometryUpdater = DynamicPlaneGeometryUpdater;
+    PlaneGeometryUpdater.prototype.createDynamicUpdaterImpl = function(primitives, groundPrimitives){
+        return new DynamicPlaneGeometryUpdater(this, primitives, groundPrimitives);
+    };
 
     /**
      * @private

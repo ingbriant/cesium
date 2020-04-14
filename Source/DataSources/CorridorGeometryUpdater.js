@@ -202,7 +202,9 @@ import Property from './Property.js';
         options.extrudedHeight = extrudedHeightValue;
     };
 
-    CorridorGeometryUpdater.DynamicGeometryUpdater = DynamicCorridorGeometryUpdater;
+    CorridorGeometryUpdater.prototype.createDynamicUpdaterImpl = function(primitives, groundPrimitives){
+        return new  DynamicCorridorGeometryUpdater(this, primitives, groundPrimitives);
+    };
 
     /**
      * @private

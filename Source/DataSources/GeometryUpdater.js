@@ -489,6 +489,6 @@ import Property from './Property.js';
         }
         //>>includeEnd('debug');
 
-        return new this.constructor.DynamicGeometryUpdater(this, primitives, groundPrimitives);
+        return this.createDynamicUpdaterImpl(primitives, groundPrimitives);
     };
 export default GeometryUpdater;

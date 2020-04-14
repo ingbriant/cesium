@@ -209,7 +209,9 @@ import Property from './Property.js';
         options.extrudedHeight = extrudedHeightValue;
     };
 
-    RectangleGeometryUpdater.DynamicGeometryUpdater = DynamicRectangleGeometryUpdater;
+    RectangleGeometryUpdater.prototype.createDynamicUpdaterImpl = function(primitives, groundPrimitives){
+        return new DynamicRectangleGeometryUpdater(this, primitives, groundPrimitives);
+    };
 
     /**
      * @private

@@ -169,7 +169,9 @@ import Property from './Property.js';
         options.granularity = defined(granularity) ? granularity.getValue(Iso8601.MINIMUM_VALUE) : undefined;
     };
 
-    WallGeometryUpdater.DynamicGeometryUpdater = DynamicWallGeometryUpdater;
+    WallGeometryUpdater.prototype.createDynamicUpdaterImpl = function(primitives, groundPrimitives){
+        return new DynamicWallGeometryUpdater(this, primitives, groundPrimitives);
+    };
 
     /**
      * @private

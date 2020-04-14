@@ -188,7 +188,9 @@ import Property from './Property.js';
 
     BoxGeometryUpdater.prototype._onEntityPropertyChanged = heightReferenceOnEntityPropertyChanged;
 
-    BoxGeometryUpdater.DynamicGeometryUpdater = DynamicBoxGeometryUpdater;
+    BoxGeometryUpdater.prototype.createDynamicUpdaterImpl = function(primitives, groundPrimitives){
+        return new DynamicBoxGeometryUpdater(this, primitives, groundPrimitives);
+    };
 
     /**
      * @private

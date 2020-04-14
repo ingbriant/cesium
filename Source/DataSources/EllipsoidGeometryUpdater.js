@@ -222,7 +222,9 @@ import Property from './Property.js';
 
     EllipsoidGeometryUpdater.prototype._onEntityPropertyChanged = heightReferenceOnEntityPropertyChanged;
 
-    EllipsoidGeometryUpdater.DynamicGeometryUpdater = DynamicEllipsoidGeometryUpdater;
+    EllipsoidGeometryUpdater.prototype.createDynamicUpdaterImpl = function(primitives, groundPrimitives){
+        return new DynamicEllipsoidGeometryUpdater(this, primitives, groundPrimitives);
+    };
 
     /**
      * @private

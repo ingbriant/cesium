@@ -299,7 +299,9 @@ import Property from './Property.js';
         return !options.perPositionHeight && (!isExtruded && height === 0 || (isExtruded && options.closeTop && options.closeBottom));
     };
 
-    PolygonGeometryUpdater.DynamicGeometryUpdater = DyanmicPolygonGeometryUpdater;
+    PolygonGeometryUpdater.prototype.createDynamicUpdaterImpl = function(primitives, groundPrimitives){
+        return new DyanmicPolygonGeometryUpdater(this, primitives, groundPrimitives);
+    };
 
     /**
      * @private

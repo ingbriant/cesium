@@ -164,7 +164,9 @@ import Property from './Property.js';
         options.cornerType = defined(cornerType) ? cornerType.getValue(Iso8601.MINIMUM_VALUE) : undefined;
     };
 
-    PolylineVolumeGeometryUpdater.DynamicGeometryUpdater = DynamicPolylineVolumeGeometryUpdater;
+    PolylineVolumeGeometryUpdater.prototype.createDynamicUpdaterImpl = function(primitives, groundPrimitives){
+        return new DynamicPolylineVolumeGeometryUpdater(this, primitives, groundPrimitives);
+    };
 
     /**
      * @private

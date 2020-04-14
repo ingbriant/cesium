@@ -203,7 +203,9 @@ import Property from './Property.js';
 
     CylinderGeometryUpdater.prototype._onEntityPropertyChanged = heightReferenceOnEntityPropertyChanged;
 
-    CylinderGeometryUpdater.DynamicGeometryUpdater = DynamicCylinderGeometryUpdater;
+    CylinderGeometryUpdater.prototype.createDynamicUpdaterImpl = function(primitives, groundPrimitives){
+        return new  DynamicCylinderGeometryUpdater(this, primitives, groundPrimitives);
+    };
 
     /**
      * @private

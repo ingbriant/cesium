@@ -210,7 +210,9 @@ import Property from './Property.js';
         options.extrudedHeight = extrudedHeightValue;
     };
 
-    EllipseGeometryUpdater.DynamicGeometryUpdater = DynamicEllipseGeometryUpdater;
+    EllipseGeometryUpdater.prototype.createDynamicUpdaterImpl = function(primitives, groundPrimitives){
+        return new DynamicEllipseGeometryUpdater(this, primitives, groundPrimitives);
+    };
 
     /**
      * @private
