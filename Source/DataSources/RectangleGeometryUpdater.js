@@ -66,7 +66,6 @@ import Property from './Property.js';
 
     if (defined(Object.create)) {
         RectangleGeometryUpdater.prototype = Object.create(GroundGeometryUpdater.prototype);
-        RectangleGeometryUpdater.prototype.constructor = RectangleGeometryUpdater;
     }
 
     /**
@@ -221,7 +220,6 @@ import Property from './Property.js';
 
     if (defined(Object.create)) {
         DynamicRectangleGeometryUpdater.prototype = Object.create(DynamicGeometryUpdater.prototype);
-        DynamicRectangleGeometryUpdater.prototype.constructor = DynamicRectangleGeometryUpdater;
     }
 
     DynamicRectangleGeometryUpdater.prototype._isHidden = function(entity, rectangle, time) {

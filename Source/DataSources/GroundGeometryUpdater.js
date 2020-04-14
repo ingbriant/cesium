@@ -33,7 +33,6 @@ import TerrainOffsetProperty from './TerrainOffsetProperty.js';
 
     if (defined(Object.create)) {
         GroundGeometryUpdater.prototype = Object.create(GeometryUpdater.prototype);
-        GroundGeometryUpdater.prototype.constructor = GroundGeometryUpdater;
     }
 
     Object.defineProperties(GroundGeometryUpdater.prototype, {

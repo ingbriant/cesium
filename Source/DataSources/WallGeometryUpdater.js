@@ -50,7 +50,6 @@ import Property from './Property.js';
 
     if (defined(Object.create)) {
         WallGeometryUpdater.prototype = Object.create(GeometryUpdater.prototype);
-        WallGeometryUpdater.prototype.constructor = WallGeometryUpdater;
     }
 
     /**
@@ -181,7 +180,6 @@ import Property from './Property.js';
 
     if (defined(Object.create)) {
         DynamicWallGeometryUpdater.prototype = Object.create(DynamicGeometryUpdater.prototype);
-        DynamicWallGeometryUpdater.prototype.constructor = DynamicWallGeometryUpdater;
     }
 
     DynamicWallGeometryUpdater.prototype._isHidden = function(entity, wall, time) {

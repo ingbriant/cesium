@@ -105,7 +105,6 @@ import UrlTemplateImageryProvider from './UrlTemplateImageryProvider.js';
 
     if (defined(Object.create)) {
         TileMapServiceImageryProvider.prototype = Object.create(UrlTemplateImageryProvider.prototype);
-        TileMapServiceImageryProvider.prototype.constructor = TileMapServiceImageryProvider;
     }
 
     TileMapServiceImageryProvider.prototype._requestMetadata = function() {

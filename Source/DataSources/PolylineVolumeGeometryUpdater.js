@@ -50,7 +50,6 @@ import Property from './Property.js';
 
     if (defined(Object.create)) {
         PolylineVolumeGeometryUpdater.prototype = Object.create(GeometryUpdater.prototype);
-        PolylineVolumeGeometryUpdater.prototype.constructor = PolylineVolumeGeometryUpdater;
     }
 
     /**
@@ -176,7 +175,6 @@ import Property from './Property.js';
 
     if (defined(Object.create)) {
         DynamicPolylineVolumeGeometryUpdater.prototype = Object.create(DynamicGeometryUpdater.prototype);
-        DynamicPolylineVolumeGeometryUpdater.prototype.constructor = DynamicPolylineVolumeGeometryUpdater;
     }
 
     DynamicPolylineVolumeGeometryUpdater.prototype._isHidden = function(entity, polylineVolume, time) {

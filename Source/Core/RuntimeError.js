@@ -50,7 +50,6 @@ import defined from './defined.js';
 
     if (defined(Object.create)) {
         RuntimeError.prototype = Object.create(Error.prototype);
-        RuntimeError.prototype.constructor = RuntimeError;
     }
 
     RuntimeError.prototype.toString = function() {

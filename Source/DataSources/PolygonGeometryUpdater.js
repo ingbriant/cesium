@@ -76,7 +76,6 @@ import Property from './Property.js';
 
     if (defined(Object.create)) {
         PolygonGeometryUpdater.prototype = Object.create(GroundGeometryUpdater.prototype);
-        PolygonGeometryUpdater.prototype.constructor = PolygonGeometryUpdater;
     }
 
     /**
@@ -311,7 +310,6 @@ import Property from './Property.js';
 
     if (defined(Object.create)) {
         DyanmicPolygonGeometryUpdater.prototype = Object.create(DynamicGeometryUpdater.prototype);
-        DyanmicPolygonGeometryUpdater.prototype.constructor = DyanmicPolygonGeometryUpdater;
     }
 
     DyanmicPolygonGeometryUpdater.prototype._isHidden = function(entity, polygon, time) {

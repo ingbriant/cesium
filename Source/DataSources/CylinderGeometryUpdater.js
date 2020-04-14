@@ -61,7 +61,6 @@ import Property from './Property.js';
 
     if (defined(Object.create)) {
         CylinderGeometryUpdater.prototype = Object.create(GeometryUpdater.prototype);
-        CylinderGeometryUpdater.prototype.constructor = CylinderGeometryUpdater;
     }
 
     Object.defineProperties(CylinderGeometryUpdater.prototype, {
@@ -215,7 +214,6 @@ import Property from './Property.js';
 
     if (defined(Object.create)) {
         DynamicCylinderGeometryUpdater.prototype = Object.create(DynamicGeometryUpdater.prototype);
-        DynamicCylinderGeometryUpdater.prototype.constructor = DynamicCylinderGeometryUpdater;
     }
 
     DynamicCylinderGeometryUpdater.prototype._isHidden = function(entity, cylinder, time) {

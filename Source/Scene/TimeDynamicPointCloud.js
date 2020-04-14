@@ -17,6 +17,7 @@ import PointCloudEyeDomeLighting from './PointCloudEyeDomeLighting.js';
 import PointCloudShading from './PointCloudShading.js';
 import SceneMode from './SceneMode.js';
 import ShadowMode from './ShadowMode.js';
+import Cesium3DTileStyle from './Cesium3DTileStyle.js'; //eslint-disable-line
 
     /**
      * Provides playback of time-dynamic point cloud data.

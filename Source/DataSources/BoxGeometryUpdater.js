@@ -57,7 +57,6 @@ import Property from './Property.js';
 
     if (defined(Object.create)) {
         BoxGeometryUpdater.prototype = Object.create(GeometryUpdater.prototype);
-        BoxGeometryUpdater.prototype.constructor = BoxGeometryUpdater;
     }
 
     Object.defineProperties(BoxGeometryUpdater.prototype, {
@@ -200,7 +199,6 @@ import Property from './Property.js';
 
     if (defined(Object.create)) {
         DynamicBoxGeometryUpdater.prototype = Object.create(DynamicGeometryUpdater.prototype);
-        DynamicBoxGeometryUpdater.prototype.constructor = DynamicBoxGeometryUpdater;
     }
 
     DynamicBoxGeometryUpdater.prototype._isHidden = function(entity, box, time) {

@@ -65,7 +65,6 @@ import Property from './Property.js';
 
     if (defined(Object.create)) {
         EllipseGeometryUpdater.prototype = Object.create(GroundGeometryUpdater.prototype);
-        EllipseGeometryUpdater.prototype.constructor = EllipseGeometryUpdater;
     }
 
     /**
@@ -222,7 +221,6 @@ import Property from './Property.js';
 
     if (defined(Object.create)) {
         DynamicEllipseGeometryUpdater.prototype = Object.create(DynamicGeometryUpdater.prototype);
-        DynamicEllipseGeometryUpdater.prototype.constructor = DynamicEllipseGeometryUpdater;
     }
 
     DynamicEllipseGeometryUpdater.prototype._isHidden = function(entity, ellipse, time) {

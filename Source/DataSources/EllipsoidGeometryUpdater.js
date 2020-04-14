@@ -73,7 +73,6 @@ import Property from './Property.js';
 
     if (defined(Object.create)) {
         EllipsoidGeometryUpdater.prototype = Object.create(GeometryUpdater.prototype);
-        EllipsoidGeometryUpdater.prototype.constructor = EllipsoidGeometryUpdater;
     }
 
     Object.defineProperties(EllipsoidGeometryUpdater.prototype, {
@@ -246,7 +245,6 @@ import Property from './Property.js';
 
     if (defined(Object.create)) {
         DynamicEllipsoidGeometryUpdater.prototype = Object.create(DynamicGeometryUpdater.prototype);
-        DynamicEllipsoidGeometryUpdater.prototype.constructor = DynamicEllipsoidGeometryUpdater;
     }
 
     DynamicEllipsoidGeometryUpdater.prototype.update = function(time) {

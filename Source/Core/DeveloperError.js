@@ -51,7 +51,6 @@ import defined from './defined.js';
 
     if (defined(Object.create)) {
         DeveloperError.prototype = Object.create(Error.prototype);
-        DeveloperError.prototype.constructor = DeveloperError;
     }
 
     DeveloperError.prototype.toString = function() {

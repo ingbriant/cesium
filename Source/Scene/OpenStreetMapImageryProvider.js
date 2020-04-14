@@ -96,7 +96,6 @@ import UrlTemplateImageryProvider from './UrlTemplateImageryProvider.js';
 
     if (defined(Object.create)) {
         OpenStreetMapImageryProvider.prototype = Object.create(UrlTemplateImageryProvider.prototype);
-        OpenStreetMapImageryProvider.prototype.constructor = OpenStreetMapImageryProvider;
     }
 
 export default OpenStreetMapImageryProvider;

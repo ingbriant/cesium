@@ -113,6 +113,7 @@
     "deploy-s3": "gulp deploy-s3",
     "deploy-status": "gulp deploy-status",
     "deploy-set-version": "gulp deploy-set-version",
-    "typescript-definitions": "tsc -p tsconfig.declaration.json "
+    "typescript-definitions": "tsc -p tsconfig.declaration.json",
+    "validate-typescript-definitions": "tsc Build/TypeScript/Cesium.d.ts --noEmit"
   }
 }

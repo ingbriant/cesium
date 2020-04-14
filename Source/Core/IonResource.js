@@ -68,7 +68,6 @@ import RuntimeError from './RuntimeError.js';
 
     if (defined(Object.create)) {
         IonResource.prototype = Object.create(Resource.prototype);
-        IonResource.prototype.constructor = IonResource;
     }
 
     /**

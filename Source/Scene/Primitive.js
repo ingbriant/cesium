@@ -39,6 +39,7 @@ import PrimitivePipeline from './PrimitivePipeline.js';
 import PrimitiveState from './PrimitiveState.js';
 import SceneMode from './SceneMode.js';
 import ShadowMode from './ShadowMode.js';
+import Appearance from './Appearance.js'; //eslint-disable-line
 
     /**
      * A primitive represents geometry in the {@link Scene}.  The geometry can be from a single {@link GeometryInstance}

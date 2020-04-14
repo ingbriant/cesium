@@ -55,7 +55,6 @@ import Property from './Property.js';
 
     if (defined(Object.create)) {
         PlaneGeometryUpdater.prototype = Object.create(GeometryUpdater.prototype);
-        PlaneGeometryUpdater.prototype.constructor = PlaneGeometryUpdater;
     }
 
     /**
@@ -205,7 +204,6 @@ import Property from './Property.js';
 
     if (defined(Object.create)) {
         DynamicPlaneGeometryUpdater.prototype = Object.create(DynamicGeometryUpdater.prototype);
-        DynamicPlaneGeometryUpdater.prototype.constructor = DynamicPlaneGeometryUpdater;
     }
 
     DynamicPlaneGeometryUpdater.prototype._isHidden = function(entity, plane, time) {
